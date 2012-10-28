@@ -5,6 +5,7 @@ import net.wohlfart.model.StellarSystem;
 import com.jme3.math.FastMath;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 
@@ -75,6 +76,12 @@ public class PlayerViewImpl implements IPlayerView {
 	@Override
 	public Vector3f getUp() {
 		return camera.getUp();
+	}
+
+
+	@Override
+	public Vector3f getWorldCoordinates(Vector2f vector2f, float f) {
+		return camera.getWorldCoordinates(vector2f, f);
 	}
 
 }

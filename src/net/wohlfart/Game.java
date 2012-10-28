@@ -3,38 +3,39 @@ package net.wohlfart;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.util.Iterator;
 
-import net.wohlfart.model.Lights;
+import net.wohlfart.model.Display;
 import net.wohlfart.model.StellarSystem;
+import net.wohlfart.user.IClickListener;
+import net.wohlfart.user.IPlayerView;
 import net.wohlfart.user.InputProcessor;
 import net.wohlfart.user.PlayerViewImpl;
 
 import com.jme3.app.Application;
 import com.jme3.app.StatsAppState;
+import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.light.Light;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.renderer.queue.RenderQueue.Bucket;
-import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
 
 public class Game extends Application {
 	
 	
     
-    protected final Node guiNode = new Node("Gui Node") {{
-    	setQueueBucket(Bucket.Gui);
-    	setCullHint(CullHint.Never);
-    }};
     protected BitmapFont guiFont;
     protected BitmapText fpsText;
+    
+    
+    
+    protected IPlayerView playerView;
     protected InputProcessor inputProcessor;
     protected StellarSystem stellarSystem;
+    protected Display display;
 
 
 	Game() {
@@ -74,18 +75,31 @@ public class Game extends Application {
         // call user code
 		initCam();
 
-        guiFont = loadGuiFont();	         
+        guiFont = loadGuiFont();
+        
         stellarSystem = new StellarSystem(getAssetManager());
         getViewPort().attachScene(stellarSystem.getNode());
-        getGuiViewPort().attachScene(guiNode);	        
-        inputProcessor = new InputProcessor(getInputManager(), new PlayerViewImpl(stellarSystem, getCamera()));
+        
+        playerView = new PlayerViewImpl(stellarSystem, getCamera());
+
+        display = new Display(getAssetManager(), playerView);        
+        getGuiViewPort().attachScene(display.getNode());	    
+        
+        inputProcessor = new InputProcessor(getInputManager(), playerView);
         inputProcessor.addListener(new ActionListener() {
 				@Override
 				public void onAction(String name, boolean isPressed, float tpf) {
 					stop(false); // don't wait, true hangs on exit						
 				}  
 			}, InputProcessor.INPUT_MAPPING_EXIT);
-
+        inputProcessor.register(new IClickListener() {			
+			@Override
+			public void clickPerformed(final Ray ray) {
+				CollisionResults results = new CollisionResults();
+				stellarSystem.collideWithPlanets(ray, results);
+				display.showHits(results);
+			}
+		});
 
         if (stateManager.getState(StatsAppState.class) != null) {
             // Some of the tests rely on having access to fpsText
@@ -117,10 +131,10 @@ public class Game extends Application {
         stateManager.update(timePerFrame);
  
         stellarSystem.updateLogicalState(timePerFrame);
-        guiNode.updateLogicalState(timePerFrame);
+        display.updateLogicalState(timePerFrame);
         
         stellarSystem.updateGeometricState();
-        guiNode.updateGeometricState();
+        display.updateGeometricState();
 
         // render states
         stateManager.render(renderManager);
@@ -139,7 +153,7 @@ public class Game extends Application {
 
 	protected void initCam() {
 		final Vector3f lookAt = new Vector3f(0,0,-1);
-		Camera cam = getCamera();
+		final Camera cam = getCamera();
 		cam.setLocation(Vector3f.ZERO);
 		cam.lookAt(lookAt, Vector3f.UNIT_Y /* world up */);
 	}

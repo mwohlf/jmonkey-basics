@@ -1,7 +1,8 @@
 package net.wohlfart.user;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
-
 
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
@@ -12,6 +13,8 @@ import com.jme3.input.controls.InputListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 
 
@@ -55,16 +58,19 @@ public class InputProcessor {
 	public static final String MOUSE_BUTTON_MIDDLE = "MOUSE_BUTTON_MIDDLE";
 	public static final String MOUSE_BUTTON_RIGHT = "MOUSE_BUTTON_RIGHT";
 	
-	
+	private final Set<IClickListener> clickListeners = new HashSet<IClickListener>();
+
 
 	protected final InputManager inputManager;
 	protected final IPlayerView playerView;
 
 
 	// states of the mouse buttons:
-	public boolean leftMouseButtonPressed;
 	public boolean middleMouseButtonPressed;
-	public boolean rightMouseButtonPressed;
+	
+	public boolean rotationModeEnabled;
+
+
 
 	
 	
@@ -250,7 +256,7 @@ public class InputProcessor {
 		 */
 		@Override
 		public void onAnalog(final String event, final float value, final float timePerFrame) {	
-			if (!leftMouseButtonPressed) {
+			if (!rotationModeEnabled) {
 				return;
 			}						
 			final float angle =   SPEED * value * timePerFrame;
@@ -281,9 +287,12 @@ public class InputProcessor {
 			inputManager.setCursorVisible(!isPressed); // hide the cursor when the button is pressed
 			switch (event) {
 			case MOUSE_BUTTON_LEFT:
-				synchronized (InputProcessor.this) {
-					InputProcessor.this.leftMouseButtonPressed = isPressed;
-				}
+		        Vector2f click2d = inputManager.getCursorPosition();
+		        Vector3f click3d = playerView.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
+		        Vector3f dir = playerView.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+		        // Aim the ray from the clicked spot forwards.
+		        Ray ray = new Ray(click3d, dir);
+		        clickPerformed(ray);
 				break;	
 			case MOUSE_BUTTON_MIDDLE:
 				synchronized (InputProcessor.this) {
@@ -292,15 +301,32 @@ public class InputProcessor {
 				break;	
 			case MOUSE_BUTTON_RIGHT:
 				synchronized (InputProcessor.this) {
-					InputProcessor.this.rightMouseButtonPressed = isPressed;
+					InputProcessor.this.rotationModeEnabled = isPressed;
 				}
 				break;	
 			default:
 				LOGGER.severe("unknown event: '" + event + "' exiting eventhandler");
 				return; // bail out
 			}					
-		}		
+		}	
 	}
+	
+
+	// FIXME: use the bus here
+	
+	public void register(IClickListener listener) {
+		clickListeners.add(listener);
+	}
+	
+	public void unregister(IClickListener listener) {
+		clickListeners.remove(listener);
+	}
+	
+	private void clickPerformed(final Ray ray) {
+		for (IClickListener listener : clickListeners) {
+			listener.clickPerformed(ray);
+		}
+	}	
 	
 
 }
