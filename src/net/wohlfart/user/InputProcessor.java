@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.bushe.swing.event.EventService;
+import org.bushe.swing.event.EventServiceLocator;
+
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -30,7 +33,12 @@ public class InputProcessor {
 	
 	private static final Logger LOGGER = Logger.getLogger(InputProcessor.class.getName());
 	
-
+	public static final String BUS_TOPIC_USERSELECT = "BUS_TOPIC_USERSELECT";
+	public static final String BUS_TOPIC_EXIT = "BUS_TOPIC_EXIT";
+	
+	
+	
+	
 	public static final String INPUT_MAPPING_EXIT = "INPUT_MAPPING_EXIT";
 
 	public static final String MOVE_LEFT = "MOVE_LEFT";
@@ -58,28 +66,30 @@ public class InputProcessor {
 	public static final String MOUSE_BUTTON_MIDDLE = "MOUSE_BUTTON_MIDDLE";
 	public static final String MOUSE_BUTTON_RIGHT = "MOUSE_BUTTON_RIGHT";
 	
-	private final Set<IClickListener> clickListeners = new HashSet<IClickListener>();
 
 
 	protected final InputManager inputManager;
 	protected final IPlayerView playerView;
+	protected final EventService eventBus;
 
+	
 
 	// states of the mouse buttons:
 	public boolean middleMouseButtonPressed;
 	
-	public boolean rotationModeEnabled;
-
-
+	public volatile boolean rotationModeEnabled;
+	private final Set<IClickListener> clickListeners = new HashSet<IClickListener>();
 
 	
 	
 	public InputProcessor(
 			final InputManager inputManager, 
 			final IPlayerView playerView) {
+		
 		this.inputManager = inputManager;
 		this.playerView = playerView;
 		initMappings();
+		eventBus = EventServiceLocator.getEventBusService();
 		initListener();
 	}
 
@@ -113,8 +123,8 @@ public class InputProcessor {
 		inputManager.addMapping(MOUSE_BUTTON_LEFT, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 		inputManager.addMapping(MOUSE_BUTTON_MIDDLE, new MouseButtonTrigger(MouseInput.BUTTON_MIDDLE));	
 		inputManager.addMapping(MOUSE_BUTTON_RIGHT, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));	
-
 	}
+	
 
 	protected void initListener() {
 		addListener(new ActionMoveDigital(), MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN, MOVE_FORWARD, MOVE_BACKWARD);
@@ -122,6 +132,12 @@ public class InputProcessor {
 		addListener(new ActionRotateDigital(), ROTATE_LEFT, ROTATE_RIGHT, ROTATE_UP, ROTATE_DOWN, ROTATE_CLOCKWISE, ROTATE_COUNTER_CLOCKWISE);
 		addListener(new ActionRotateAnalog(), ROTATE_UP_MOUSE, ROTATE_LEFT_MOUSE, ROTATE_RIGHT_MOUSE, ROTATE_DOWN_MOUSE);
 		addListener(new ActionMouseButton(), MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_RIGHT);
+		addListener(new ActionListener() {
+			@Override
+			public void onAction(final String name, boolean isPressed, float tpf) {
+				eventBus.publish(BUS_TOPIC_EXIT, name);					
+			}  
+		}, InputProcessor.INPUT_MAPPING_EXIT);
 	}
 
 
@@ -292,7 +308,9 @@ public class InputProcessor {
 		        Vector3f dir = playerView.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
 		        // Aim the ray from the clicked spot forwards.
 		        Ray ray = new Ray(click3d, dir);
-		        clickPerformed(ray);
+		        System.out.println("publish: " + BUS_TOPIC_USERSELECT);
+		        eventBus.publish(BUS_TOPIC_USERSELECT, ray);
+		        //clickPerformed(ray);
 				break;	
 			case MOUSE_BUTTON_MIDDLE:
 				synchronized (InputProcessor.this) {

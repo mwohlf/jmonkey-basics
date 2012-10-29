@@ -26,6 +26,8 @@ public class Planet extends AbstractPlanet {
 		Random random = new Random(seed);
 		this.seed = seed;
 		
+		setName("Planet["+seed+"]");
+		
 		// random planet type
 		int index = (int) random.nextInt(PlanetType.values().length);
 		planetType = PlanetType.values()[index];
@@ -47,13 +49,14 @@ public class Planet extends AbstractPlanet {
 		Sphere sphere = new Sphere(SAMPLES, SAMPLES, radius);
 		sphere.setTextureMode(Sphere.TextureMode.Projected);
 		
-		planetGeometry = new Geometry("Planet", sphere);
+		planetGeometry = new Geometry("PlanetGeometry["+seed+"]", sphere);
 		planetGeometry.rotateUpTo(rotAxis);
 		planetGeometry.setMaterial(material);
-	    attachChild(planetGeometry);
+	    setGeometry(planetGeometry);
 	}
 		
-	
+
+
 	public float getRadius() {
 		return radius;
 	}

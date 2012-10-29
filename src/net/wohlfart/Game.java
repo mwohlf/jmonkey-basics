@@ -6,27 +6,27 @@ import java.awt.GraphicsEnvironment;
 
 import net.wohlfart.model.Display;
 import net.wohlfart.model.StellarSystem;
-import net.wohlfart.user.IClickListener;
 import net.wohlfart.user.IPlayerView;
 import net.wohlfart.user.InputProcessor;
 import net.wohlfart.user.PlayerViewImpl;
 
+import org.bushe.swing.event.EventService;
+import org.bushe.swing.event.EventServiceLocator;
+import org.bushe.swing.event.EventTopicSubscriber;
+
 import com.jme3.app.Application;
-import com.jme3.app.StatsAppState;
-import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
-import com.jme3.input.controls.ActionListener;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.system.AppSettings;
 
 public class Game extends Application {
+		
+	protected final EventService eventBus;
 	
 	
-    
     protected BitmapFont guiFont;
     protected BitmapText fpsText;
     
@@ -40,7 +40,8 @@ public class Game extends Application {
 
 	Game() {
 		setSettings(getFullscreenSetting());
-		//setSettings(getWindowSetting());
+		//setSettings(getWindowSetting());	
+		eventBus = EventServiceLocator.getEventBusService();
 	}
 	
 	
@@ -52,7 +53,11 @@ public class Game extends Application {
 		settings.setResolution(modes[i].getWidth(),modes[i].getHeight());
 		settings.setFrequency(modes[i].getRefreshRate());
 		settings.setDepthBits(modes[i].getBitDepth());
-		settings.setFullscreen(device.isFullScreenSupported());		
+		settings.setFullscreen(device.isFullScreenSupported());
+		// slower but looks better
+		settings.setVSync(true); 
+		// anti-aliasing can be a big performance problem...
+		settings.setSamples(8); 
 		return settings;
 	}
 	
@@ -65,6 +70,8 @@ public class Game extends Application {
 		settings.setFrequency(modes[i].getRefreshRate());
 		settings.setDepthBits(modes[i].getBitDepth());
 		settings.setFullscreen(false);
+		settings.setVSync(true); 
+		settings.setSamples(8); 
 		return settings;
 	}
 
@@ -85,29 +92,25 @@ public class Game extends Application {
         display = new Display(getAssetManager(), playerView);        
         getGuiViewPort().attachScene(display.getNode());	    
         
+     
         inputProcessor = new InputProcessor(getInputManager(), playerView);
-        inputProcessor.addListener(new ActionListener() {
-				@Override
-				public void onAction(String name, boolean isPressed, float tpf) {
-					stop(false); // don't wait, true hangs on exit						
-				}  
-			}, InputProcessor.INPUT_MAPPING_EXIT);
-        inputProcessor.register(new IClickListener() {			
+        
+        eventBus.subscribeStrongly(InputProcessor.BUS_TOPIC_EXIT, new EventTopicSubscriber<Object>() {
 			@Override
-			public void clickPerformed(final Ray ray) {
-				CollisionResults results = new CollisionResults();
-				stellarSystem.collideWithPlanets(ray, results);
-				display.showHits(results);
+			public void onEvent(String string, Object object) {
+				stop(false); // don't wait, true hangs on exit	
 			}
 		});
-
-        if (stateManager.getState(StatsAppState.class) != null) {
-            // Some of the tests rely on having access to fpsText
-            // for quick display.  Maybe a different way would be better.
-            //stateManager.getState(StatsAppState.class).setFont(guiFont);
-            fpsText = stateManager.getState(StatsAppState.class).getFpsText();
-        }
-
+        
+        
+//        inputProcessor.register(new IClickListener() {			
+//			@Override
+//			public void clickPerformed(final Ray ray) {
+//				CollisionResults results = new CollisionResults();
+//				stellarSystem.collideWithPlanets(ray, results);
+//				display.showHits(results);
+//			}
+//		});
 
 		initAmbient();
 		initObjects();

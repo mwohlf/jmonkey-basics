@@ -7,10 +7,8 @@ import net.wohlfart.model.planets.AbstractPlanet;
 import net.wohlfart.model.planets.Planet;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.collision.CollisionResults;
 import com.jme3.light.Light;
 import com.jme3.math.FastMath;
-import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -104,10 +102,6 @@ public class StellarSystem {
 		//stellarNode.move(vector.mult(0.1f));		
 	}
 
-
-	public void collideWithPlanets(Ray ray, CollisionResults results) {
-		stellarNode.collideWith(ray, results);
-	}
 
 
 }
