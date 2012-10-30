@@ -39,8 +39,8 @@ public class Game extends Application {
 
 
 	Game() {
-		setSettings(getFullscreenSetting());
-		//setSettings(getWindowSetting());	
+		//setSettings(getFullscreenSetting());
+		setSettings(getWindowSetting());	
 		eventBus = EventServiceLocator.getEventBusService();
 	}
 	

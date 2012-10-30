@@ -153,7 +153,8 @@ public enum PlanetType {
 
 	double perlinNoise(final float x, final float y, final float z, final float amplitude, final float frequency) {
 		// the noise returns [-1 .. +1]
-		double noise = Noise.noise(x * frequency, y * frequency, z * frequency);
+		//double noise = PerlinNoise.noise(x * frequency, y * frequency, z * frequency);
+		double noise = SimplexNoise.noise(x * frequency, y * frequency, z * frequency);
 		// normalize into [0 .. 1] and multiply with the amplitude
 		return amplitude * ((noise + 1d) / 2d);   // [0 .. 1]
 	}

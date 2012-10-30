@@ -1,10 +1,10 @@
 package net.wohlfart.model.planets;
 
 /**
- * 
+ * see: http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
  * @author Ken Perlin
  */
-public final class Noise {
+public final class PerlinNoise {
 
 	/**
 	 * @param x 
