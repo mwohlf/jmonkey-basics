@@ -1,4 +1,4 @@
-package net.wohlfart.model.planets;
+package net.wohlfart.model.noise;
 
 /**
  * see: http://freespace.virgin.net/hugo.elias/models/m_perlin.htm

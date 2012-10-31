@@ -308,7 +308,6 @@ public class InputProcessor {
 		        Vector3f dir = playerView.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
 		        // Aim the ray from the clicked spot forwards.
 		        Ray ray = new Ray(click3d, dir);
-		        System.out.println("publish: " + BUS_TOPIC_USERSELECT);
 		        eventBus.publish(BUS_TOPIC_USERSELECT, ray);
 		        //clickPerformed(ray);
 				break;	

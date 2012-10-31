@@ -33,7 +33,6 @@ public class StellarNode extends Node {
 		eventBus.subscribeStrongly(InputProcessor.BUS_TOPIC_USERSELECT, new EventTopicSubscriber<Object>() {
 			@Override
 			public void onEvent(String string, Object ray) {
-				System.out.println("onEvent: " + InputProcessor.BUS_TOPIC_USERSELECT);
 				CollisionResults results = new CollisionResults();
 				collideWith((Ray)ray, results);				
 				CollisionResult collisionResult = results.getClosestCollision();

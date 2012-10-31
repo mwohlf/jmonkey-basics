@@ -1,4 +1,4 @@
-package net.wohlfart.model.planets;
+package net.wohlfart.model.noise;
 
 /**
  * Simplex Noise in 2D, 3D and 4D. Based on the example code of this paper:
