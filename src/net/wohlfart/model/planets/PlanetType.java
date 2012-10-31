@@ -43,24 +43,26 @@ public enum PlanetType {
 	},
 	
 	
-	ROCK {
+	CONTINENTAL {
 		{maxRadius = 30; minRadius = 60;}
 		ColorGradient gradient = new ColorGradient( 
 				new Color(0,0,0), 
 				new Color(0,0,100), 
 				new Color(0,0,255), 
 				new Color(10,10,255), 
-				new Color(255,255,255), 
+				new Color(180,180,180), 
 				new Color(10,255,10), 
 				new Color(0,255,0), 
 				new Color(0,100,0));
 		Color getColor(final float x, final float y, final float z, final PlanetTexture texture) {
-			double noise = createNoise(x, FastMath.asin(y), z, 0.5f, 4);
-			return gradient.getColor(noise);
+			double groundNoise = createNoise(x, FastMath.asin(y), z, 0.5f, 4);
+			Color ground = gradient.getColor(groundNoise);
+			double skyNoise = createNoise(x*2, FastMath.asin(y)*4, z*2, 0.2f, 3);			
+			return ColorGradient.linearGradient(ground, Color.WHITE, skyNoise);
 		}
 	};
 	
-//	CONTINENTAL {
+//	ROCK {
 //		{maxRadius = 15;}
 //		Color getColor(final float x, final float y, final float z, final PlanetTexture texture) {
 //			float persistence;
@@ -151,41 +153,5 @@ public enum PlanetType {
 		return amplitude * noise;
 	}
 
-	/*
-	Color overlay(final Color ground, final Color air, final Color transparent) {
-		return ground;
-	}
 	
-	
-	Color cosGradient(final Color top, final Color low, final float v) {		
-		// v [0 .. 1]
-		float value = v;
-		value = (1-(FastMath.cos(value*FastMath.PI) + 1) / 2);
-		value = (1-(FastMath.cos(value*FastMath.PI) + 1) / 2);
-		value = (1-(FastMath.cos(value*FastMath.PI) + 1) / 2);
-	
-		float red = (   ((float)top.getRed() * value) 
-				+ ((float)low.getRed() * (1f-value))) / 256f;
-		float green = (   ((float)top.getGreen() * value) 
-				+ ((float)low.getGreen() * (1f-value))) / 256f;
-		float blue = (   ((float)top.getBlue() * value) 
-				+ ((float)low.getBlue() * (1f-value))) / 256f;
-		return new Color(red, green, blue);
-	}
-
-	
-	Color linearGradient(final Color top, final Color low, final float value) {		
-		float red = (   ((float)top.getRed() * value) 
-				+ ((float)low.getRed() * (1f-value))) / 256f;
-		float green = (   ((float)top.getGreen() * value) 
-				+ ((float)low.getGreen() * (1f-value))) / 256f;
-		float blue = (   ((float)top.getBlue() * value) 
-				+ ((float)low.getBlue() * (1f-value))) / 256f;
-		return new Color(red, green, blue);
-	}
-	
-	// see: 
-	*/
-	
-
 }

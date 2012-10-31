@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.jme3.math.FastMath;
+
 /**
  * converting noise to color
  * 
@@ -140,5 +142,39 @@ public class ColorGradient {
 			return Double.compare(this.point, that.point);
 		}
 	}
+	
+	
+	public static Color cosGradient(final Color top, final Color low, final float v) {		
+		// v [-1 .. 1]
+		float value = v;
+		
+		value = FastMath.sin(value*FastMath.HALF_PI);
+		value = FastMath.sin(value*FastMath.HALF_PI);
+		value = FastMath.sin(value*FastMath.HALF_PI);
+	
+		float red = (   ((float)top.getRed() * value) 
+				+ ((float)low.getRed() * (1f-value))) / 256f;
+		float green = (   ((float)top.getGreen() * value) 
+				+ ((float)low.getGreen() * (1f-value))) / 256f;
+		float blue = (   ((float)top.getBlue() * value) 
+				+ ((float)low.getBlue() * (1f-value))) / 256f;
+		return new Color(red, green, blue);
+	}
+
+	
+
+	public static Color linearGradient(final Color top, final Color low, final double skyNoise) {
+		// v [-1 .. 1]
+		float value = (float)(skyNoise+1f)/2f;
+				
+		float red = (   ((float)top.getRed() * value) 
+				+ ((float)low.getRed() * (1f-value))) / 256f;
+		float green = (   ((float)top.getGreen() * value) 
+				+ ((float)low.getGreen() * (1f-value))) / 256f;
+		float blue = (   ((float)top.getBlue() * value) 
+				+ ((float)low.getBlue() * (1f-value))) / 256f;
+		return new Color(red, green, blue);
+	}
+	
 
 }
