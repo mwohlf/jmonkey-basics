@@ -3,13 +3,20 @@ package net.wohlfart.model;
 import java.util.Iterator;
 import java.util.Random;
 
+import net.wohlfart.Game;
 import net.wohlfart.model.planets.AbstractPlanet;
 import net.wohlfart.model.planets.Planet;
 
+import org.bushe.swing.event.EventService;
+
 import com.jme3.asset.AssetManager;
+import com.jme3.collision.CollisionResult;
+import com.jme3.collision.CollisionResults;
 import com.jme3.light.Light;
 import com.jme3.math.FastMath;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
@@ -27,10 +34,12 @@ public class StellarSystem {
 	private final StellarNode stellarNode;
 	private final SkyCube skyCube;
 	
+	private final EventService eventBus;
 
-
-	public StellarSystem(final AssetManager assetManager) {
+	public StellarSystem(final AssetManager assetManager, final EventService eventBus) {
 		delegatee = new Node(ROOT_NODE);
+		this.eventBus = eventBus;
+		
 		// skyCube and stellarNode are in the Sky rendering bucket, 
 		// the order of adding them is important
 		delegatee.attachChild(skyCube = new SkyCube(assetManager));
@@ -59,6 +68,8 @@ public class StellarSystem {
 					0,
 					FastMath.cos(rad) * 200); 
 		}		
+		
+		
 
 		//  construction ahead
 		//
@@ -100,6 +111,20 @@ public class StellarSystem {
 		localNode.move(vector);
 		stellarNode.move(vector.mult(1f));	
 		//stellarNode.move(vector.mult(0.1f));		
+	}
+
+
+	public void actionClickRay(final Ray ray) {
+		CollisionResults results = new CollisionResults();
+		stellarNode.collideWith(ray, results);
+		CollisionResult collisionResult = results.getClosestCollision();
+		if (collisionResult != null) {
+			Geometry geometry = collisionResult.getGeometry(); // use a planet hashmap to resolve the planet
+			Planet planet = (Planet) geometry.getUserData(AbstractPlanet.PLANET_KEY);
+			eventBus.publish(Game.TEXT_MESSAGE, "Planet clicked: " + planet);
+		} else {
+			eventBus.publish(Game.TEXT_MESSAGE, "");
+		}
 	}
 
 

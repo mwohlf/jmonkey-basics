@@ -1,10 +1,9 @@
-package net.wohlfart.model;
+package net.wohlfart.model.hud;
 
-import net.wohlfart.model.planets.Planet;
-import net.wohlfart.user.IPlayerView;
+import net.wohlfart.Game;
+import net.wohlfart.user.IAvatar;
 
 import org.bushe.swing.event.EventService;
-import org.bushe.swing.event.EventServiceLocator;
 import org.bushe.swing.event.EventTopicSubscriber;
 
 import com.jme3.asset.AssetManager;
@@ -15,11 +14,15 @@ import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
 
-public class Display {
+
+/**
+ * 
+ * dialogs and hud for the main game screen
+ */
+public class DisplayNode {
 	public static final String DISPLAY_NODE = "DISPLAY_NODE";
 	
 	protected final EventService eventBus;
-
 
 	private Node delegatee = new Node();
 
@@ -29,17 +32,18 @@ public class Display {
 	private final BitmapText viewText;
 	private final BitmapText infoText;
 
-	private final IPlayerView playerView;
+	private final IAvatar avatar;
 
 
-	public Display(final AssetManager assetManager, final IPlayerView playerView) {
+	public DisplayNode(final AssetManager assetManager, final IAvatar avatar, final EventService eventBus) {
 		delegatee = new Node(DISPLAY_NODE);
-
-		this.playerView = playerView;
+		this.avatar = avatar;
+		this.eventBus = eventBus;
 
 		delegatee.setQueueBucket(Bucket.Gui);
 		delegatee.setCullHint(CullHint.Never);
 
+		assetManager.loadFont("Interface/Fonts/Default.fnt");
 		guiFont = assetManager.loadFont("Interface/Fonts/Console.fnt");
 
 		perfText = new BitmapText(guiFont, false);      
@@ -59,19 +63,25 @@ public class Display {
 		infoText = new BitmapText(guiFont, false);      
 		infoText.setSize(guiFont.getCharSet().getRenderedSize());       
 		infoText.setColor(ColorRGBA.Red);                               
-		infoText.setLocalTranslation(10, 500 + infoText.getLineHeight() * 10, 0);
-		infoText.setText("");                                             
+		infoText.setLocalTranslation(10, 300 + infoText.getLineHeight() * 10, 0);
+		infoText.setText("info text here");                                             
 		delegatee.attachChild(infoText);
 		
-		eventBus = EventServiceLocator.getEventBusService();
-		eventBus.subscribeStrongly(StellarNode.BUS_TOPIC_STELLAR_SELECT, new EventTopicSubscriber<Planet>() {
+		eventBus.subscribeStrongly(Game.TEXT_MESSAGE, new EventTopicSubscriber<String>() {
 			@Override
-			public void onEvent(String string, Planet planet) {			
-				infoText.setText("\n----> " + planet);
+			public void onEvent(String string, String message) {			
+				infoText.setText("\n----> " + message);
 			}
 		});
-
 	}
+	
+	
+	
+	
+	
+	
+	
+	
 
 	public Node getNode() {
 		return delegatee;
@@ -86,9 +96,9 @@ public class Display {
 				); 
 
 		viewText.setText(""
-				+ "direction: " + playerView.getDirection() + "\n"
-				+ "up: " + playerView.getDirection() + "\n"
-				+ "left: " + playerView.getLeft() + "\n"
+				+ "direction: " + avatar.getDirection() + "\n"
+				+ "up: " + avatar.getDirection() + "\n"
+				+ "left: " + avatar.getLeft() + "\n"
 				); 
 	}
 

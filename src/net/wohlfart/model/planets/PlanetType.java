@@ -53,7 +53,7 @@ public enum PlanetType {
 				new Color(180,180,180), 
 				new Color(10,255,10), 
 				new Color(0,255,0), 
-				new Color(0,100,0));
+				new Color(0,50,0));
 		Color getColor(final float x, final float y, final float z, final PlanetTexture texture) {
 			double groundNoise = createNoise(x, FastMath.asin(y), z, 0.5f, 4);
 			Color ground = gradient.getColor(groundNoise);
@@ -62,59 +62,17 @@ public enum PlanetType {
 		}
 	};
 	
-//	ROCK {
-//		{maxRadius = 15;}
-//		Color getColor(final float x, final float y, final float z, final PlanetTexture texture) {
-//			float persistence;
-//			int octaves;
-//			double result;
-//			float max;
-//
-//			// some initial corrections
-//			float xx = x;
-//			float yy = FastMath.asin(y);
-//			float zz = z;
-//			
-//			
-//			//// first run for the ground:
-//			persistence = 0.1f;
-//			octaves = 5;
-//
-//			result = 0; max = 0;
-//			for (int i=0; i < octaves; i++) {
-//				float frequency = FastMath.pow(2, i);
-//				float amplitude = FastMath.pow(persistence, i);
-//				result += perlinNoise(xx, yy, zz, amplitude, frequency);
-//				max += amplitude;
-//			}
-//			Color ground = cosGradient(Color.BLUE.darker(), Color.GREEN.darker().darker(), (float)(result / max));		
-//			
-//			
-//			// another run for the clouds:
-//			persistence = 0.5f;
-//			octaves = 5;
-//
-//			result = 0; max = 0;
-//			for (int i=0; i < octaves; i++) {
-//				float frequency = FastMath.pow(2, i);
-//				float amplitude = FastMath.pow(persistence, i);
-//				result += perlinNoise(xx, yy* 2, zz, amplitude, frequency);
-//				max += amplitude;
-//			}
-//			
-//			return cosGradient(ground, Color.WHITE, (float)result / max);		
-//		}
-//	};
+
 
 
 	
-	float minRadius = 10;  // in 10^6 m = 1000 km (earth has 12 000 km)
+	float minRadius = 6.371f;  // in 10^6 m = 1000 km (earth has 6371 km)
 	float maxRadius = 100;
 	
 	float minRot = FastMath.TWO_PI / 60f;     // in rad/s, 2pi mean one rotation per second 2pi/3 means one rotation in 3 sec
 	float maxRot = FastMath.TWO_PI / 300f;
 	
-	
+	float maxAxisDeplacement = 0.25f ;  // this value is randomly added to a normalized up vectors x and y values, earth is around 23.4 degree
 
 
 
@@ -132,7 +90,7 @@ public enum PlanetType {
 	}
 
 
-	
+	// adding octaves
 	double createNoise(final float x, final float y, final float z, final float persistence, final int octaves) {
 		double result = 0;
 		float max = 0;
@@ -146,6 +104,7 @@ public enum PlanetType {
 	}
 	
 	
+	// calling the noise
 	double createNoise(final float x, final float y, final float z, final float amplitude, final float frequency) {
 		// the noise returns [-1 .. +1]
 		//double noise = PerlinNoise.noise(x * frequency, y * frequency, z * frequency);

@@ -5,11 +5,12 @@ import net.wohlfart.model.StellarSystem;
 import com.jme3.math.FastMath;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 
-public class PlayerViewImpl implements IPlayerView {
+public class AvatarImpl implements IAvatar {
 	
 	private final Camera camera;
 	private final StellarSystem stellarSystem;
@@ -17,7 +18,7 @@ public class PlayerViewImpl implements IPlayerView {
 	private final Vector3f translationForce = new Vector3f();
 	private final Quaternion rotationForce = new Quaternion();	
 	
-	public PlayerViewImpl(final StellarSystem stellarSystem, final Camera camera) {
+	public AvatarImpl(final StellarSystem stellarSystem, final Camera camera) {
 		this.camera = camera;
 		this.stellarSystem = stellarSystem;
 	}
@@ -82,6 +83,16 @@ public class PlayerViewImpl implements IPlayerView {
 	@Override
 	public Vector3f getWorldCoordinates(Vector2f vector2f, float f) {
 		return camera.getWorldCoordinates(vector2f, f);
+	}
+
+
+	@Override
+	public void actionClick(final Vector2f click2d) {
+		Vector3f click3d = getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
+		Vector3f direction = getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+		// Aim the ray from the clicked spot forwards.
+		Ray ray = new Ray(click3d, direction);
+		stellarSystem.actionClickRay(ray);	
 	}
 
 }

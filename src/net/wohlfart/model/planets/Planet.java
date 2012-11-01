@@ -11,20 +11,24 @@ import com.jme3.scene.shape.Sphere;
 public class Planet extends AbstractPlanet {
 	// number of sample / level of detail 3 means we have a pyramid...
 	private static final int SAMPLES = 40;  
+	// neutral texture
+	private static final String TEXTURE_PATH = "Common/MatDefs/Light/Lighting.j3md";  
 	
 	private final long seed;
+	private final Random random;
 	
 	private final PlanetType planetType;
 	
-	private final Geometry planetGeometry;
+	private final Geometry planetGeometry;     // z seems to be the up axis for geometries
 	private final float rotSpeed;              // [rad/s]
 	private final Vector3f rotAxis;
 	private final float radius;                // in [10^6 m] 
 	
 	
 	public Planet(final AssetManager assetManager, final long seed) {
-		Random random = new Random(seed);
 		this.seed = seed;
+		this.random = new Random(seed);
+
 		
 		setName("Planet["+seed+"]");
 		
@@ -32,17 +36,16 @@ public class Planet extends AbstractPlanet {
 		int index = (int) random.nextInt(PlanetType.values().length);
 		planetType = PlanetType.values()[index];
 		
-		radius = (1f - random.nextFloat()) * (planetType.maxRadius - planetType.minRadius)
-				+ planetType.minRadius;
+		radius = getRandom(planetType.minRadius, planetType.maxRadius);
 		
-		rotSpeed = (1f - random.nextFloat()) * (planetType.maxRot - planetType.minRot)
-				+ planetType.minRot;
+		rotSpeed = getRandom(planetType.minRot, planetType.maxRot);
 				
-		rotAxis = new Vector3f(
-				random.nextFloat(), random.nextFloat(), random.nextFloat()).normalizeLocal(); // TODO: parameterize
+		float f = planetType.maxAxisDeplacement;
+		//rotAxis = new Vector3f(0,0,1);
+		rotAxis = new Vector3f(getRandom(-f,f), getRandom(-f,f), 1);
 		
 		// Lighting.j3md supports: DiffuseMap, NormalMap, SpecularMap, and ParallaxMap. 
-	    Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");	  
+	    Material material = new Material(assetManager, TEXTURE_PATH);	  
 		material.setTexture("DiffuseMap", new PlanetTexture(radius, planetType, seed));		
 
 		
@@ -55,6 +58,10 @@ public class Planet extends AbstractPlanet {
 	    setGeometry(planetGeometry);
 	}
 		
+	
+	private float getRandom(float min, float max) {
+		return ((1f - random.nextFloat()) * (max - min)) + min;
+	}
 
 
 	public float getRadius() {

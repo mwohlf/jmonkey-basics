@@ -87,27 +87,7 @@ public class ColorGradient {
 			distanceRight = (right.point - value) / delta;
 		}
 
-		//return calculateHSVColor(left, right, distanceLeft, distanceRight);
 		return calculateRGBColor(left, right, distanceLeft, distanceRight);
-	}
-
-	
-	private Color calculateHSVColor(final GradientPoint left, final GradientPoint right, final double distanceLeft, final double distanceRight) {
-			
-		HSLColor left2 = new HSLColor(left.color);
-		HSLColor right2 = new HSLColor(right.color);
-
-		
-		float hue   =   ((((float)left2.getHue()   * (float)distanceLeft) 
-				+ ((float)right2.getHue()  * (float)distanceRight))) / 2f;
-		
-		float saturation =    ((((float)left2.getSaturation()  * (float)distanceLeft) 
-				+ ((float)right2.getSaturation() * (float)distanceRight))) / 2f;
-
-		float luminance =   ((((float)left2.getLuminance() * (float)distanceLeft) 
-				+ ((float)right2.getLuminance() * (float)distanceRight))) / 2f;
-		
-		return  new HSLColor(hue, saturation, luminance).getRGB();
 	}
 
 	
