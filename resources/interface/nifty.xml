@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
+  
+  <useStyles filename="nifty-default-styles.xml" />
+  <useControls filename="nifty-default-controls.xml" />
+
+  <screen id="intro">
+      <layer id="foreground" childLayout="center" >
+          <text text="welcome" style="base-font" color="#eeef" valign="center" width="100%" /> 
+      </layer>
+      
+      <layer id="windows" childLayout="absolute">  
+        <control id="window-1" name="window" title="List of Planets" width="240px" height="170px" x="5px" >
+          <control id="listBox-1" name="listBox" vertical="optional" horizontal="optional" height="170px" width="240px" selection="Multiple" />      
+        </control>
+      </layer>
+  </screen>
+  
+     
+  <screen id="stellar" >
+      
+    <layer id="windows" childLayout="absolute">
+      <control id="window-1" name="window" title="List of Planets" width="180px" height="70px" x="5px" childClip="true">
+        <text text="I'm a window!" style="base-font" color="#eeef" valign="center" width="100%" />      
+      </control>
+      <control id="window-2" name="window" title="You can drag me around..." width="200px" height="100px" x="300px" childClip="true">
+          <control id="console" width="100%" height="100%"  name="nifty-console" lines="3" align="center" valign="center" />
+      </control>
+            
+    </layer>
+  </screen>
+
+  <screen id="end">
+  </screen>
+  
+</nifty>

@@ -14,18 +14,27 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.ColorRGBA;
+import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.system.AppSettings;
+
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.screen.Screen;
 
 /**
  * hosting application states
  */
 public class Game extends Application {
+	private static final String PATH_TO_NIFTY_UI = "interface/nifty.xml";
+	private static final String INITIAL_UI_SCREEN_ID = "intro";  
+	private static final String INPUT_MAPPING_EXIT = "INPUT_MAPPING_EXIT";  // event key
 	
-	protected static final String INPUT_MAPPING_EXIT = "INPUT_MAPPING_EXIT";
+	public static final String TEXT_MESSAGE = "TEXT_MESSAGE";  // event bus message channel
 	
-	public static final String TEXT_MESSAGE = "TEXT_MESSAGE";
 
 	private final EventService eventBus;
+
+	private Nifty nifty;
 
 
 
@@ -73,6 +82,7 @@ public class Game extends Application {
     public void initialize() {
         super.initialize();
         
+        // hook an exit event
 		getInputManager().addMapping(INPUT_MAPPING_EXIT, new KeyTrigger(KeyInput.KEY_ESCAPE));
 		getInputManager().addListener(new ActionListener() {
 			@Override
@@ -81,13 +91,29 @@ public class Game extends Application {
 			}  
 		}, INPUT_MAPPING_EXIT);
   
-		getViewPort().setBackgroundColor(ColorRGBA.LightGray);         
+		getViewPort().setBackgroundColor(ColorRGBA.LightGray);
+		
+		// init a UI
+	    NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
+                   inputManager,
+                   audioRenderer,
+                   guiViewPort);	    
+	    nifty = niftyDisplay.getNifty();
+	    nifty.fromXml(PATH_TO_NIFTY_UI, INITIAL_UI_SCREEN_ID);
+
+	    // attach the nifty display to the gui view port as a processor
+	    guiViewPort.addProcessor(niftyDisplay);
+
 		getStateManager().attach(new StellarState());          
     }
 
     
+    private Element getElement(final String id) {
+    	return nifty.getCurrentScreen().findElementByName(id);
+    }
+    
 
-    // event look
+    // event loop
 	@Override
     public void update() {
         super.update(); // makes sure to execute AppTasks
@@ -102,10 +128,23 @@ public class Game extends Application {
         // finish update
         stateManager.postRender();        
     }
+	
+	
+	// exit the game
+	@Override
+	public void stop(boolean waitFor) {
+		// do some cleanup on exit
+		
+		super.stop(waitFor);
+	};
 
 
 	public EventService getEventBus() {
 		return eventBus; 
+	}
+	
+	public Screen getCurrentNiftyScreen() {
+		return nifty.getCurrentScreen();
 	}
 
 

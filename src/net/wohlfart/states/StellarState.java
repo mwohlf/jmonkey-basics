@@ -12,11 +12,15 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 
+import de.lessvoid.nifty.controls.Console;
+import de.lessvoid.nifty.elements.Element;
+
 
 /**
  * this game state is where we show planets and starships and stuff
  */
 public class StellarState extends AbstractAppState {
+	private static final String CONSOLE_NAME = "console";
 	
 	protected Game application;
 
@@ -47,6 +51,17 @@ public class StellarState extends AbstractAppState {
 
         display = new DisplayNode(application.getAssetManager(), playerView, application.getEventBus());        
         application.getGuiViewPort().attachScene(display.getNode());	    
+        
+        
+        Element elem = application.getCurrentNiftyScreen().findElementByName(CONSOLE_NAME);
+        System.out.println("elem is: " + elem);
+
+        
+        Console console = application.getCurrentNiftyScreen().findNiftyControl(CONSOLE_NAME, Console.class);
+        if (console != null) {
+        	console.output("Hello :)");
+        }
+        
     }
 	
 
@@ -54,6 +69,8 @@ public class StellarState extends AbstractAppState {
 	@Override
     public void update(final float timePerFrame) {
         super.update(timePerFrame);  // makes sure to execute AppTasks
+        
+
 
         stellarSystem.updateLogicalState(timePerFrame);
         display.updateLogicalState(timePerFrame);
