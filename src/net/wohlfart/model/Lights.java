@@ -11,22 +11,20 @@ import com.jme3.math.Vector3f;
 
 public class Lights implements Iterable<Light> {
 
-	Light[] lights = new Light[] {
-			new AmbientLight() {{
-				setColor(ColorRGBA.White.mult(0.6f));
-			}},
-			new DirectionalLight() {{
-				setDirection(new Vector3f(-1,1,-2).normalizeLocal());
-				setColor(ColorRGBA.White);
-			}},
-	};
+    Light[] lights = new Light[] { new AmbientLight() {
+        {
+            setColor(ColorRGBA.White.mult(0.6f));
+        }
+    }, new DirectionalLight() {
+        {
+            setDirection(new Vector3f(-1, 1, -2).normalizeLocal());
+            setColor(ColorRGBA.White);
+        }
+    }, };
 
-
-	@Override
-	public Iterator<Light> iterator() {
-		return Arrays.asList(lights).iterator();
-	}
-
-
+    @Override
+    public Iterator<Light> iterator() {
+        return Arrays.asList(lights).iterator();
+    }
 
 }

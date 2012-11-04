@@ -14,59 +14,38 @@ import com.jme3.scene.Spatial;
 
 public class StellarNode extends Node {
 
-	public static final String BUS_TOPIC_STELLAR_SELECT = "BUS_TOPIC_STELLAR_SELECT";
+    public static final String BUS_TOPIC_STELLAR_SELECT = "BUS_TOPIC_STELLAR_SELECT";
 
-	protected final EventService eventBus;
+    protected final EventService eventBus;
 
-	public StellarNode(final AssetManager assetManager) {		
-		setQueueBucket(Bucket.Sky);
-		eventBus = EventServiceLocator.getEventBusService();
-//		eventBus.subscribeStrongly(InputProcessor.BUS_TOPIC_USERSELECT, new EventTopicSubscriber<Object>() {
-//			@Override
-//			public void onEvent(String string, Object ray) {
-//				CollisionResults results = new CollisionResults();
-//				collideWith((Ray)ray, results);				
-//				CollisionResult collisionResult = results.getClosestCollision();
-//				if (collisionResult != null) {
-//					Geometry geometry = collisionResult.getGeometry(); // use a planet hashmap to resolve the planet
-//					Planet planet = (Planet) geometry.getUserData(AbstractPlanet.PLANET_KEY);
-//					eventBus.publish(BUS_TOPIC_STELLAR_SELECT, planet);
-//				}
-//			}
-//		});
-	}
+    public StellarNode(final AssetManager assetManager) {
+        setQueueBucket(Bucket.Sky);
+        eventBus = EventServiceLocator.getEventBusService();
+    }
 
+    @Override
+    public int attachChild(Spatial child) {
+        return super.attachChild(child);
+    }
 
-	@Override
-	public int attachChild(Spatial child) {
-		return super.attachChild(child);
-	}
+    /**
+     * sort for correct rendering in the Bucket.Sky queue
+     */
+    void sortChildren() {
+        ArrayList<Spatial> list = new ArrayList<Spatial>();
+        list.addAll(children);
+        children.clear();
 
+        Collections.sort(list, new Comparator<Spatial>() {
+            @Override
+            public int compare(Spatial spatial1, Spatial spatial2) {
+                return -Float.compare(spatial1.getWorldTranslation().length(), spatial2.getWorldTranslation().length());
+            }
+        });
 
-	/**
-	 * sort for correct rendering in the Bucket.Sky queue
-	 */
-	void sortChildren() {
-		ArrayList<Spatial> list = new ArrayList<Spatial>();
-		list.addAll(children);		
-		children.clear();
-
-		Collections.sort(list, new Comparator<Spatial>() {
-			@Override
-			public int compare(Spatial spatial1, Spatial spatial2) {
-				return -Float.compare(
-						spatial1.getWorldTranslation().length(), 
-						spatial2.getWorldTranslation().length());
-			}			
-		});
-
-		for (Spatial spatial : list) {
-			children.add(spatial);
-		}
-	}
-	
-	
-	
-
+        for (Spatial spatial : list) {
+            children.add(spatial);
+        }
+    }
 
 }

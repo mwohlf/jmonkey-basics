@@ -1,4 +1,4 @@
-package net.wohlfart.model.hud;
+package net.wohlfart.model.ui;
 
 import com.jme3.niftygui.NiftyJmeDisplay;
 

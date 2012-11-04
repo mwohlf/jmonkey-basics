@@ -1,10 +1,16 @@
 package net.wohlfart.states;
 
-import net.wohlfart.Game;
+import net.wohlfart.IStateContext;
+import net.wohlfart.events.LifecycleCreate;
+import net.wohlfart.events.LifecycleDestroy;
 import net.wohlfart.model.StellarSystem;
-import net.wohlfart.model.hud.DisplayNode;
+import net.wohlfart.model.ui.DisplayNode;
 import net.wohlfart.user.AvatarImpl;
+import net.wohlfart.user.IAvatar;
 import net.wohlfart.user.InputProcessor;
+
+import org.bushe.swing.event.EventService;
+import org.bushe.swing.event.generics.TypeReference;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
@@ -12,82 +18,81 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 
-import de.lessvoid.nifty.controls.Console;
-import de.lessvoid.nifty.elements.Element;
-
+import de.lessvoid.nifty.Nifty;
 
 /**
  * this game state is where we show planets and starships and stuff
  */
 public class StellarState extends AbstractAppState {
-	private static final String CONSOLE_NAME = "console";
-	
-	protected Game application;
+    private static final String SCREEN_ID = "stellarScreen"; // used in nifty.xml to identify the hud stuff
 
-	protected StellarSystem stellarSystem;
-	protected DisplayNode display;
-	protected InputProcessor inputProcessor;
+    protected InputProcessor inputProcessor;
+    protected StellarSystem stellarSystem;
+    protected DisplayNode display;
+    protected EventService eventBus;
+    protected IAvatar avatar;
 
-	
-	// setup
-	@Override
-    public void initialize(AppStateManager stateManager, Application game) {
+    protected IStateContext context;
+
+    // setup
+    @Override
+    public void initialize(final AppStateManager stateManager, final Application application) {
         super.initialize(stateManager, application);
-        this.application = (Game) game;
-        
-        // initial setup camera for this state	
-		final Camera cam = application.getCamera();
-		cam.setLocation(Vector3f.ZERO);
-		final Vector3f lookAt = new Vector3f(0,0,-1);
-		cam.lookAt(lookAt, Vector3f.UNIT_Y /* world up */);
-        
+        IStateContext context = (IStateContext) application;
+
+        eventBus = context.getEventBus();
+
+        // initial setup camera for this state
+        final Camera cam = context.getCamera();
+        cam.setLocation(Vector3f.ZERO);
+        final Vector3f lookAt = new Vector3f(0, 0, -1);
+        cam.lookAt(lookAt, Vector3f.UNIT_Y /* world up */);
+
         // attach stellar view
-        stellarSystem = new StellarSystem(application.getAssetManager(), application.getEventBus());
-        application.getViewPort().attachScene(stellarSystem.getNode());
+        stellarSystem = new StellarSystem(context.getAssetManager(), eventBus);
+        context.getViewPort().attachScene(stellarSystem.getNode());
 
-        AvatarImpl playerView = new AvatarImpl(stellarSystem, application.getCamera());
-        inputProcessor = new InputProcessor(application.getInputManager());
-        inputProcessor.attachAvatar(playerView);
+        avatar = new AvatarImpl(stellarSystem, context.getCamera());
+        TypeReference<LifecycleCreate<IAvatar>> type = new TypeReference<LifecycleCreate<IAvatar>>() {
+        };
+        LifecycleCreate<IAvatar> event = new LifecycleCreate<IAvatar>(avatar);
+        eventBus.publish(type.getType(), event);
+        inputProcessor = new InputProcessor(context.getInputManager());
+        inputProcessor.attachAvatar(avatar);
 
-        display = new DisplayNode(application.getAssetManager(), playerView, application.getEventBus());        
-        application.getGuiViewPort().attachScene(display.getNode());	    
-        
-        
-        Element elem = application.getCurrentNiftyScreen().findElementByName(CONSOLE_NAME);
-        System.out.println("elem is: " + elem);
+        display = new DisplayNode(context.getAssetManager(), avatar, eventBus);
+        context.getGuiViewPort().attachScene(display.getNode());
 
-        
-        Console console = application.getCurrentNiftyScreen().findNiftyControl(CONSOLE_NAME, Console.class);
-        if (console != null) {
-        	console.output("Hello :)");
-        }
-        
+        // TODO: remove this and implement this in a screen controller:
+        Nifty nifty = context.getNifty();
+        nifty.gotoScreen(SCREEN_ID);
     }
-	
 
-    // update state
-	@Override
+    // update state loop
+    @Override
     public void update(final float timePerFrame) {
-        super.update(timePerFrame);  // makes sure to execute AppTasks
-        
-
+        super.update(timePerFrame); // makes sure to execute AppTasks
 
         stellarSystem.updateLogicalState(timePerFrame);
         display.updateLogicalState(timePerFrame);
-        
+
         stellarSystem.updateGeometricState();
         display.updateGeometricState();
     }
-    
-    
+
     // destroy
-	@Override
+    @Override
     public void cleanup() {
         super.cleanup();
-        
+
         inputProcessor.detachCurrentAvatar();
-        application.getViewPort().detachScene(stellarSystem.getNode());
-        application.getGuiViewPort().detachScene(display.getNode());       
+
+        TypeReference<LifecycleDestroy<IAvatar>> type = new TypeReference<LifecycleDestroy<IAvatar>>() {};
+        LifecycleDestroy<IAvatar> event = new LifecycleDestroy<IAvatar>(avatar);
+        eventBus.publish(type.getType(), event);
+
+        context.getViewPort().detachScene(stellarSystem.getNode());
+        context.getGuiViewPort().detachScene(display.getNode());
     }
 
 }
