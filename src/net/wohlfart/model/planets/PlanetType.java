@@ -19,8 +19,8 @@ public enum PlanetType {
         }
         ColorGradient gradient = new ColorGradient(Color.RED.brighter(), Color.YELLOW);
         @Override
-        Color getColor(final float x, final float y, final float z) {
-            final double noise = createNoise(x, FastMath.asin(y), z, 0.5f, 5);
+        Color getColor(final float x, final float y, final float z, final float v) {
+            final double noise = createNoise(x, FastMath.asin(y), z, v, 0.5f, 5);
             return gradient.getColor(noise);
         }
     },
@@ -32,8 +32,8 @@ public enum PlanetType {
         }
         ColorGradient gradient = new ColorGradient(Color.BLUE, Color.WHITE);
         @Override
-        Color getColor(final float x, final float y, final float z) {
-            final double noise = createNoise(x, FastMath.asin(y), z, 0.5f, 5);
+        Color getColor(final float x, final float y, final float z, final float v) {
+            final double noise = createNoise(x, FastMath.asin(y), z, v, 0.5f, 5);
             return gradient.getColor(noise);
         }
     },
@@ -45,8 +45,8 @@ public enum PlanetType {
         }
         ColorGradient gradient = new ColorGradient(new Color(255, 213, 133), new Color(102, 68, 58));
         @Override
-        Color getColor(final float x, final float y, final float z) {
-            final double noise = createNoise(x / 1.5f, FastMath.asin(y) * 10, z / 1.5f, 0.5f, 5);
+        Color getColor(final float x, final float y, final float z, final float v) {
+            final double noise = createNoise(x / 1.5f, FastMath.asin(y) * 10, z / 1.5f, v, 0.5f, 5);
             return gradient.getColor(noise);
         }
     },
@@ -59,10 +59,10 @@ public enum PlanetType {
         ColorGradient gradient = new ColorGradient(new Color(0, 0, 0), new Color(0, 0, 100), new Color(0, 0, 255), new Color(10, 10, 255), new Color(180, 180,
                 180), new Color(10, 255, 10), new Color(0, 255, 0), new Color(0, 50, 0));
         @Override
-        Color getColor(final float x, final float y, final float z) {
-            final double groundNoise = createNoise(x, FastMath.asin(y), z, 0.5f, 4);
+        Color getColor(final float x, final float y, final float z, final float v) {
+            final double groundNoise = createNoise(x, FastMath.asin(y), z, v, 0.5f, 4);
             final Color ground = gradient.getColor(groundNoise);
-            final double skyNoise = createNoise(x * 2, FastMath.asin(y) * 4, z * 2, 0.2f, 3);
+            final double skyNoise = createNoise(x * 2, FastMath.asin(y) * 4, z * 2, v, 0.2f, 3);
             return ColorGradient.linearGradient(ground, Color.WHITE, skyNoise);
         }
     };
@@ -77,39 +77,40 @@ public enum PlanetType {
 
     /**
      * fallback
-     * 
+     *
      * @param x
      *            [0..1]
      * @param y
      *            [0..1]
      * @param z
      *            [0..1]
+     * @param textureVariant
      * @param texture
      *            , needed for access to some randomness
      * @return the color on the surface at the location with the specified normal vector
      */
-    Color getColor(final float x, final float y, final float z) {
+    Color getColor(final float x, final float y, final float z, final float textureVariant) {
         return Color.YELLOW;
     }
 
     // adding octaves
-    double createNoise(final float x, final float y, final float z, final float persistence, final int octaves) {
+    double createNoise(final float x, final float y, final float z, final float v, final float persistence, final int octaves) {
         double result = 0;
         float max = 0;
         for (int i = 0; i < octaves; i++) {
             float frequency = FastMath.pow(2, i);
             float amplitude = FastMath.pow(persistence, i);
-            result += createNoise(x, y, z, amplitude, frequency);
+            result += createNoise(x, y, z, v, amplitude, frequency);
             max += amplitude;
         }
         return result / max;
     }
 
     // calling the noise
-    double createNoise(final float x, final float y, final float z, final float amplitude, final float frequency) {
+    double createNoise(final float x, final float y, final float z, final float v, final float amplitude, final float frequency) {
         // the noise returns [-1 .. +1]
         // double noise = PerlinNoise.noise(x * frequency, y * frequency, z * frequency);
-        double noise = SimplexNoise.noise(x * frequency, y * frequency, z * frequency);
+        double noise = SimplexNoise.noise(x * frequency, y * frequency, z * frequency, v);
         return amplitude * noise;
     }
 

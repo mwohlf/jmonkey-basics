@@ -3,8 +3,6 @@ package net.wohlfart;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.wohlfart.states.StellarState;
 
@@ -84,14 +82,14 @@ public class Game extends Application implements IStateContext {
 
         // init a UI
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(getAssetManager(), getInputManager(), getAudioRenderer(), getGuiViewPort());
-        Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
-        Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
+        //  Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
+        //  Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
         nifty = niftyDisplay.getNifty();
         nifty.fromXml(PATH_TO_NIFTY_UI, INTRO_SCREEN_ID);
 
         // attach the nifty display to the gui view port as a processor
         getGuiViewPort().addProcessor(niftyDisplay);
-        
+
         // FIXME: try to remove the dependency on a specific state here
         getStateManager().attach(new StellarState()); // initial state to render
     }

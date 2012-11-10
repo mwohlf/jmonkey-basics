@@ -24,6 +24,8 @@ public class PlanetTexture extends Texture2D {
         super(new Image(Format.RGBA8, width, height, ByteBuffer.allocateDirect(width * height * 4)));
         random = new Random(seed);
 
+        float textureVariant = random.nextFloat();
+
         byte[] data = new byte[width * height * 4];
         getImage().getData(0).get(data);
 
@@ -33,7 +35,7 @@ public class PlanetTexture extends Texture2D {
             for (int y = 0; y < height; y++) {
                 vector = getNormalVector(x, y);
                 vector.mult(255f);
-                color = planetType.getColor(vector.x, vector.y, vector.z); // we might need to pass random here
+                color = planetType.getColor(vector.x, vector.y, vector.z, textureVariant);
                 setPixel(x, y, color, width, height, data);
             }
         }
