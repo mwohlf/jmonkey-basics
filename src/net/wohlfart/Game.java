@@ -25,7 +25,7 @@ import de.lessvoid.nifty.Nifty;
  * hosting application states
  */
 public class Game extends Application implements IStateContext {
-    private static final String PATH_TO_NIFTY_UI = "interface/nifty.xml";
+    private static final String PATH_TO_NIFTY_UI = "interface/nifty-screens.xml";
     private static final String INTRO_SCREEN_ID = "introScreen";
     private static final String INPUT_MAPPING_EXIT = "INPUT_MAPPING_EXIT"; // event key
 

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
+
+    <!-- check out: http://jmonkeyengine.org/wiki/doku.php/jme3:advanced:nifty_gui_scenarios -->
+
+  <useStyles filename="nifty-default-styles.xml" />
+  <useControls filename="nifty-default-controls.xml" />
+
+
+  <screen id="introScreen">  <!-- Game.INTRO_SCREEN_ID -->
+
+      <layer id="foreground" childLayout="center" >
+          <text text="welcome" style="base-font" color="#eeef" valign="center" width="100%" />
+      </layer>
+
+      <layer id="windows" childLayout="absolute">
+        <control id="window-1" name="window" title="List of Planets" width="240px" height="50px" x="5px" >
+          <control id="listBox-1" name="listBox" vertical="optional" horizontal="optional" displayItems="5" height="50px" width="240px" selection="Single" />
+        </control>
+      </layer>
+
+  </screen>
+
+
+  <screen id="stellarScreen" controller="net.wohlfart.ui.StellarScreenController">  <!-- StellarState.SCREEN_ID -->
+
+    <layer id="windows" childLayout="absolute">
+
+      <control name="window" id="window-1" title="List of Planets" width="180px" height="70px" x="5px" childClip="true">
+        <control name="label" id="window-1-text" text="I'm a window!" style="base-font" color="#eeef" valign="center" width="100%" />
+      </control>
+
+      <control name="window" id="window-2" title="You can drag me around..." width="200px" height="100px" x="300px" childClip="true">
+          <control name="nifty-console" id="console" width="100%" height="100%"   lines="3" align="center" valign="center" />
+      </control>
+
+      <control name="window" id="window-3" title="List of Planets" width="180px" height="120px" x="500px" childClip="true" >
+          <panel id="panel" childLayout="vertical" width="" height="" backgroundColor="#ff0">
+          <control name="listBox" id="listbox-1"  horizontal="on" vertical="on"
+                   displayItems="10" selection="Multiple" width="100%" height="" />
+          </panel>
+      </control>
+
+      <control name="window" id="window-4" width="180px" height="200px" x="100px" y="300" resizable="true">
+
+      </control>
+
+    </layer>
+
+  </screen>
+
+  <screen id="end">
+  </screen>
+
+</nifty>

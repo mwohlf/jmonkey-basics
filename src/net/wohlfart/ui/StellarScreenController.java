@@ -13,10 +13,8 @@ import org.bushe.swing.event.EventSubscriber;
 import org.bushe.swing.event.generics.TypeReference;
 
 import de.lessvoid.nifty.Nifty;
-import de.lessvoid.nifty.controls.Console;
-import de.lessvoid.nifty.controls.ConsoleCommands;
-import de.lessvoid.nifty.controls.ConsoleCommands.ConsoleCommand;
 import de.lessvoid.nifty.controls.Label;
+import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.Window;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
@@ -36,6 +34,7 @@ public class StellarScreenController implements ScreenController {
     protected EventSubscriber<LifecycleDestroy<IAvatar>> avatarDestroy;
     protected EventSubscriber<DoSelection<IPlanet>> planetSelect;
     protected EventSubscriber<UndoSelection<IPlanet>> planetUnselect;
+    private ListBox listBox;
 
     // this constructor is never called!
     public StellarScreenController() {
@@ -86,17 +85,29 @@ public class StellarScreenController implements ScreenController {
         window.setTitle("Selected Planet");
         planetLabel = screen.findNiftyControl("window-1-text", Label.class);
         planetLabel.setText("- none -");
-        
-        final Console console = screen.findNiftyControl("console", Console.class);
-        console.output("Hello :)");
-        ConsoleCommands consoleCommands = new ConsoleCommands(nifty, console);
 
-        ConsoleCommand simpleCommand = new ConsoleCommand() {
-            @Override
-            public void execute(String[] arg0) {
-                console.output("jo");
-            }};
-        consoleCommands.registerCommand("hello", simpleCommand);
+        listBox = screen.findNiftyControl("listbox-1", ListBox.class);
+        listBox.addItem("line1");
+        listBox.addItem("line2");
+        listBox.addItem("line3");
+        listBox.addItem("line4");
+        listBox.addItem("line5");
+        listBox.addItem("line6");
+        listBox.addItem("line7");
+
+        //listBox.
+
+
+//        final Console console = screen.findNiftyControl("console", Console.class);
+//        console.output("Hello :)");
+//        ConsoleCommands consoleCommands = new ConsoleCommands(nifty, console);
+//
+//        ConsoleCommand simpleCommand = new ConsoleCommand() {
+//            @Override
+//            public void execute(String[] arg0) {
+//                console.output("jo");
+//            }};
+//        consoleCommands.registerCommand("hello", simpleCommand);
 
     }
 

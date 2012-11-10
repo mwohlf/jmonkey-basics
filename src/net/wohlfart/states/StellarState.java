@@ -32,13 +32,13 @@ public class StellarState extends AbstractAppState {
     protected EventService eventBus;
     protected IAvatar avatar;
 
-    protected IStateContext context;
+    protected IStateContext context; // the game class
 
     // setup
     @Override
     public void initialize(final AppStateManager stateManager, final Application application) {
         super.initialize(stateManager, application);
-        IStateContext context = (IStateContext) application;
+        context = (IStateContext) application;
 
         eventBus = context.getEventBus();
 
