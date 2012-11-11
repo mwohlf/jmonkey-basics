@@ -3,7 +3,7 @@ package net.wohlfart.events;
 public class UndoSelection<T> {
     private final T element;
 
-    public UndoSelection(T element) {
+    public UndoSelection(final T element) {
         this.element = element;
     }
 

@@ -17,21 +17,22 @@ import com.jme3.system.AppSettings;
 /**
  * hosting application states
  */
-public class Game extends Application implements IStateContext {
+class Game extends Application implements IStateContext {
 
     private static final String INPUT_MAPPING_EXIT = "INPUT_MAPPING_EXIT"; // event key
 
     private final EventService eventBus;
 
     Game() {
+        super();
         eventBus = EventServiceLocator.getEventBusService();
     }
 
     protected AppSettings getFullscreenSetting() {
-        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        DisplayMode[] modes = device.getDisplayModes();
-        int i = 0; // note: there are usually several, let's pick the first
-        AppSettings settings = new AppSettings(true);
+        final GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        final DisplayMode[] modes = device.getDisplayModes();
+        final int i = 0; // note: there are usually several, let's pick the first
+        final AppSettings settings = new AppSettings(true);
         settings.setResolution(modes[i].getWidth(), modes[i].getHeight());
         settings.setFrequency(modes[i].getRefreshRate());
         settings.setDepthBits(modes[i].getBitDepth());
@@ -44,13 +45,13 @@ public class Game extends Application implements IStateContext {
     }
 
     protected AppSettings getWindowSetting() {
-        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        final GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode[] modes = device.getDisplayModes();
-        int i = 0; // note: there are usually several, let's pick the first
+        int index = 0; // note: there are usually several, let's pick the first
         AppSettings settings = new AppSettings(true);
-        settings.setResolution(modes[i].getWidth() / 2, modes[i].getHeight() / 2);
-        settings.setFrequency(modes[i].getRefreshRate());
-        settings.setDepthBits(modes[i].getBitDepth());
+        settings.setResolution(modes[index].getWidth() / 2, modes[index].getHeight() / 2);
+        settings.setFrequency(modes[index].getRefreshRate());
+        settings.setDepthBits(modes[index].getBitDepth());
         settings.setFullscreen(false);
         settings.setVSync(true);
         settings.setSamples(8);
@@ -65,7 +66,7 @@ public class Game extends Application implements IStateContext {
         getInputManager().addMapping(INPUT_MAPPING_EXIT, new KeyTrigger(KeyInput.KEY_ESCAPE));
         getInputManager().addListener(new ActionListener() {
             @Override
-            public void onAction(final String name, boolean isPressed, float tpf) {
+            public void onAction(final String name, final boolean isPressed, final float tpf) {
                 stop(false); // don't wait, true hangs on exit
             }
         }, INPUT_MAPPING_EXIT);
@@ -93,7 +94,7 @@ public class Game extends Application implements IStateContext {
 
     // exit the game
     @Override
-    public void stop(boolean waitFor) {
+    public void stop(final boolean waitFor) {
         // TODO: do some cleanup on exit
 
         super.stop(waitFor);

@@ -18,6 +18,7 @@ import com.jme3.scene.Spatial.CullHint;
 /**
  *
  * dialogs and hud for the main game screen
+ * @deprecated
  */
 public class DisplayNode {
     public static final String DISPLAY_NODE = "DISPLAY_NODE";

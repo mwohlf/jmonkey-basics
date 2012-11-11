@@ -19,18 +19,18 @@ import com.jme3.scene.Spatial;
  */
 public class StellarNode extends Node {
     // node scaling, this affects all planet radius and movements
-    public float SCALE = 1000000.0f; // 1 unit is 1000km = x10^3 km = x10^6km
+    public static final float SCALE = 1000000.0f; // 1 unit is 1000km = x10^3 km = x10^6km
     //
-    public float SCALE_INV = 1.f/SCALE;
+    public static final float SCALE_INV = 1.f/SCALE;
     // at least 100 km distance from any planet we can't get closer
-    private float MIN_DIST_FROM_STELLAR_OBJECT = 0.1f; // ~100km ; [10^3 km]
+    private static final float MIN_DIST_FROM_STELLAR_OBJECT = 0.1f; // ~100km ; [10^3 km]
 
     public StellarNode(final AssetManager assetManager) {
         setQueueBucket(Bucket.Sky);
     }
 
     @Override
-    public int attachChild(Spatial child) {
+    public int attachChild(final Spatial child) {
         return super.attachChild(child);
     }
 
@@ -38,13 +38,13 @@ public class StellarNode extends Node {
      * sort for correct rendering in the Bucket.Sky queue
      */
     void sortChildren() {
-        ArrayList<Spatial> list = new ArrayList<Spatial>();
+        final ArrayList<Spatial> list = new ArrayList<Spatial>();
         list.addAll(children);
         children.clear();
 
         Collections.sort(list, new Comparator<Spatial>() {
             @Override
-            public int compare(Spatial spatial1, Spatial spatial2) {
+            public int compare(final Spatial spatial1, final Spatial spatial2) {
                 return -Float.compare(spatial1.getWorldTranslation().length(), spatial2.getWorldTranslation().length());
             }
         });
@@ -58,7 +58,7 @@ public class StellarNode extends Node {
     // scale down the moves
 
     @Override
-    public Spatial move(Vector3f move) {
+    public Spatial move(final Vector3f move) {
         return this.move(move.x , move.y, move.z);
     }
 

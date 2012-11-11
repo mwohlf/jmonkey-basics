@@ -2,6 +2,9 @@ package net.wohlfart.user;
 
 import java.util.logging.Logger;
 
+import net.wohlfart.IStateContext;
+import net.wohlfart.ui.IScreenView;
+
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -11,6 +14,7 @@ import com.jme3.input.controls.InputListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.input.event.MouseMotionEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 
@@ -21,51 +25,56 @@ public class InputProcessor {
     private static final Logger LOGGER = Logger.getLogger(InputProcessor.class.getName());
 
     // @formatter:off
-    enum Key {
-        MOVE_LEFT, 
-        MOVE_RIGHT, 
-        MOVE_UP, 
-        MOVE_DOWN, 
-        MOVE_FORWARD, 
-        MOVE_BACKWARD, 
-        MOVE_FORWARD_WHEEL, 
+    private enum Key {
+        MOVE_LEFT,
+        MOVE_RIGHT,
+        MOVE_UP,
+        MOVE_DOWN,
+        MOVE_FORWARD,
+        MOVE_BACKWARD,
+        MOVE_FORWARD_WHEEL,
         MOVE_BACKWARD_WHEEL,
 
-        ROTATE_LEFT, 
-        ROTATE_RIGHT, 
-        ROTATE_UP, 
-        ROTATE_DOWN, 
-        ROTATE_CLOCKWISE, 
+        ROTATE_LEFT,
+        ROTATE_RIGHT,
+        ROTATE_UP,
+        ROTATE_DOWN,
+        ROTATE_CLOCKWISE,
         ROTATE_COUNTER_CLOCKWISE,
 
-        ROTATE_UP_MOUSE, 
-        ROTATE_DOWN_MOUSE, 
-        ROTATE_LEFT_MOUSE, 
+        ROTATE_UP_MOUSE,
+        ROTATE_DOWN_MOUSE,
+        ROTATE_LEFT_MOUSE,
         ROTATE_RIGHT_MOUSE,
 
-        MOUSE_BUTTON_LEFT, 
-        MOUSE_BUTTON_MIDDLE, 
+        MOUSE_BUTTON_LEFT,
+        MOUSE_BUTTON_MIDDLE,
         MOUSE_BUTTON_RIGHT;
     } // @formatter:on
 
     // user input source
-    protected final InputManager inputManager;
+    private final InputManager inputManager;
 
     // target object to move:
-    protected IAvatar avatar;
+    private IAvatar avatar;
+    private IScreenView screen;
 
     // some state information
     private boolean rotationModeEnabled;
 
     // action processors
-    protected ActionMoveDigital actionMoveDigital = new ActionMoveDigital();
-    protected ActionWheelAnalog actionWheelAnalog = new ActionWheelAnalog();
-    protected ActionRotateDigital actionRotateDigital = new ActionRotateDigital();
-    protected ActionRotateAnalog actionRotateAnalog = new ActionRotateAnalog();
-    protected ActionMouseButton actionMouseButton = new ActionMouseButton();
+    private ActionMoveDigital actionMoveDigital = new ActionMoveDigital();
+    private ActionWheelAnalog actionWheelAnalog = new ActionWheelAnalog();
+    private ActionRotateDigital actionRotateDigital = new ActionRotateDigital();
+    private ActionRotateAnalog actionRotateAnalog = new ActionRotateAnalog();
+    private ActionMouseButton actionMouseButton = new ActionMouseButton();
+    private DetailedInputListener rawInputListener = new DetailedInputListener();
 
-    public InputProcessor(final InputManager inputManager) {
-        this.inputManager = inputManager;
+
+
+
+    public InputProcessor(final IStateContext context) {
+        this.inputManager = context.getInputManager();
     }
 
     public void attachAvatar(final IAvatar avatar) {
@@ -85,6 +94,15 @@ public class InputProcessor {
         inputManager.removeListener(actionRotateDigital);
         inputManager.removeListener(actionRotateAnalog);
         inputManager.removeListener(actionMouseButton);
+    }
+
+    public void attachScreen(final IScreenView screen) {
+        this.screen = screen;
+        inputManager.addRawInputListener(rawInputListener);
+    }
+
+    public void detachCurrentScreen() {
+        inputManager.removeRawInputListener(rawInputListener);
     }
 
     protected void initMappings() {
@@ -116,41 +134,41 @@ public class InputProcessor {
         inputManager.addMapping(Key.MOUSE_BUTTON_RIGHT.name(), new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
     }
 
-    protected void initListener() {
-        addListener(actionMoveDigital, 
-                Key.MOVE_LEFT.name(), 
-                Key.MOVE_RIGHT.name(), 
-                Key.MOVE_UP.name(), 
-                Key.MOVE_DOWN.name(), 
-                Key.MOVE_FORWARD.name(), 
+    private void initListener() {
+        addListener(actionMoveDigital,
+                Key.MOVE_LEFT.name(),
+                Key.MOVE_RIGHT.name(),
+                Key.MOVE_UP.name(),
+                Key.MOVE_DOWN.name(),
+                Key.MOVE_FORWARD.name(),
                 Key.MOVE_BACKWARD.name());
 
-        addListener(actionWheelAnalog, 
-                Key.MOVE_FORWARD_WHEEL.name(), 
+        addListener(actionWheelAnalog,
+                Key.MOVE_FORWARD_WHEEL.name(),
                 Key.MOVE_BACKWARD_WHEEL.name());
 
-        addListener(actionRotateDigital, 
-                Key.ROTATE_LEFT.name(), 
-                Key.ROTATE_RIGHT.name(), 
-                Key.ROTATE_UP.name(), 
+        addListener(actionRotateDigital,
+                Key.ROTATE_LEFT.name(),
+                Key.ROTATE_RIGHT.name(),
+                Key.ROTATE_UP.name(),
                 Key.ROTATE_DOWN.name(),
-                Key.ROTATE_CLOCKWISE.name(), 
+                Key.ROTATE_CLOCKWISE.name(),
                 Key.ROTATE_COUNTER_CLOCKWISE.name());
 
-        addListener(actionRotateAnalog, 
-                Key.ROTATE_UP_MOUSE.name(), 
-                Key.ROTATE_LEFT_MOUSE.name(), 
-                Key.ROTATE_RIGHT_MOUSE.name(), 
+        addListener(actionRotateAnalog,
+                Key.ROTATE_UP_MOUSE.name(),
+                Key.ROTATE_LEFT_MOUSE.name(),
+                Key.ROTATE_RIGHT_MOUSE.name(),
                 Key.ROTATE_DOWN_MOUSE.name());
 
-        addListener(actionMouseButton, 
-                Key.MOUSE_BUTTON_LEFT.name(), 
-                Key.MOUSE_BUTTON_MIDDLE.name(), 
+        addListener(actionMouseButton,
+                Key.MOUSE_BUTTON_LEFT.name(),
+                Key.MOUSE_BUTTON_MIDDLE.name(),
                 Key.MOUSE_BUTTON_RIGHT.name());
     }
 
     // add external listeners,
-    protected void addListener(InputListener inputListener, String... mappingNames) {
+    private void addListener(InputListener inputListener, String... mappingNames) {
         inputManager.addListener(inputListener, mappingNames);
     }
 
@@ -311,6 +329,14 @@ public class InputProcessor {
                 LOGGER.severe("unknown event: '" + event + "' exiting eventhandler");
                 return; // bail out
             }
+        }
+    }
+
+    private class DetailedInputListener extends RawInputAdaptor {
+        @Override
+        public void onMouseMotionEvent(MouseMotionEvent evt) {
+            screen.mouseMotion(evt);
+            LOGGER.info("evt: " + evt);
         }
     }
 

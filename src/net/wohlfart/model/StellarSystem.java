@@ -3,10 +3,11 @@ package net.wohlfart.model;
 import java.util.Iterator;
 import java.util.Random;
 
+import net.wohlfart.IStateContext;
 import net.wohlfart.events.DoSelection;
 import net.wohlfart.model.planets.AbstractCelestial;
-import net.wohlfart.model.planets.ICelestial;
 import net.wohlfart.model.planets.CelestialImpl;
+import net.wohlfart.model.planets.ICelestial;
 
 import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.generics.TypeReference;
@@ -37,9 +38,10 @@ public class StellarSystem {
 
     private final EventService eventBus;
 
-    public StellarSystem(final AssetManager assetManager, final EventService eventBus) {
+    public StellarSystem(final IStateContext context) {
         delegatee = new Node(ROOT_NODE);
-        this.eventBus = eventBus;
+        AssetManager assetManager = context.getAssetManager();
+        this.eventBus = context.getEventBus();
 
         // skyCube and stellarNode are in the Sky rendering bucket,
         // the order of adding them is important
@@ -108,7 +110,7 @@ public class StellarSystem {
         CollisionResult collisionResult = results.getClosestCollision();
         ICelestial planet = null;
         if (collisionResult != null) {
-            Geometry geometry = collisionResult.getGeometry(); 
+            Geometry geometry = collisionResult.getGeometry();
             planet = (ICelestial) geometry.getUserData(AbstractCelestial.PLANET_KEY);
         }
         TypeReference<DoSelection<ICelestial>> type = new TypeReference<DoSelection<ICelestial>>() {};

@@ -11,64 +11,80 @@ import net.wohlfart.events.UpdateEvent;
 import net.wohlfart.model.planets.ICelestial;
 import net.wohlfart.user.IAvatar;
 
+import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.EventSubscriber;
 import org.bushe.swing.event.generics.TypeReference;
 
-public class StellarScreenPresenter extends AbstractScreenPresenter<StellarScreen, StellarScreenPresenter>  {
+public class StellarScreenPresenter {
 
-    // model data ----
-    protected IAvatar avatar;
+
+    // view
+    protected StellarScreenView view;
+    // model
+    protected final EventService eventBus;
+    protected final IStateContext context;
+    protected IAvatar currentAvatar;
+
 
     // need a handler to the subscriber so they don't get gc'ed
     protected final EventSubscriber<LifecycleCreate<IAvatar>> avatarCreate;
     protected final EventSubscriber<LifecycleDestroy<IAvatar>> avatarDestroy;
-
     protected final EventSubscriber<DoSelection<ICelestial>> planetSelect;
     protected final EventSubscriber<UndoSelection<ICelestial>> planetUnselect;
-
     protected final EventSubscriber<UpdateEvent<List<ICelestial>>> planetListUpdate;
 
 
+
     // this constructor is never called!
-    public StellarScreenPresenter(final StellarScreen view, final IStateContext context) {
-        super(view, context);
+    public StellarScreenPresenter(final IStateContext context) {
+        this.context = context;
+        this.eventBus = context.getEventBus();
 
         avatarCreate = new EventSubscriber<LifecycleCreate<IAvatar>>() {
             @Override
             public void onEvent(LifecycleCreate<IAvatar> event) {
-                // TODO
+                currentAvatar = event.get();
+                view.setCurrentAvatar(currentAvatar);
             }
         };
         avatarDestroy = new EventSubscriber<LifecycleDestroy<IAvatar>>() {
             @Override
             public void onEvent(LifecycleDestroy<IAvatar> event) {
-                // TODO
+                currentAvatar = null;
+                view.setCurrentAvatar(null);
             }
         };
         planetSelect = new EventSubscriber<DoSelection<ICelestial>>() {
             @Override
             public void onEvent(DoSelection<ICelestial> event) {
-                getView().setSelectedPlanet(event.get());
+                view.setSelectedPlanet(event.get());
             }
         };
         planetUnselect = new EventSubscriber<UndoSelection<ICelestial>>() {
             @Override
             public void onEvent(UndoSelection<ICelestial> event) {
-                // TODO
+                view.setSelectedPlanet(null);
             }
         };
         planetListUpdate = new EventSubscriber<UpdateEvent<List<ICelestial>>>() {
             @Override
             public void onEvent(UpdateEvent<List<ICelestial>> event) {
-                getView().setCelestialList(event.get());
+                view.setCelestialList(event.get());
             }
         };
     }
 
+    public void connectView(final StellarScreenView stellarScreenView) {
+        this.view = stellarScreenView;
+        stellarScreenView.setPresenter(this);
+        startup();
+    }
 
-    @Override
+
+
+
+
     public void startup() {
-        super.startup();
         eventBus.subscribe(new TypeReference<LifecycleCreate<IAvatar>>() {}.getType(), avatarCreate);
         eventBus.subscribe(new TypeReference<LifecycleDestroy<IAvatar>>() {}.getType(), avatarDestroy);
         eventBus.subscribe(new TypeReference<DoSelection<ICelestial>>() {}.getType(), planetSelect);
@@ -76,9 +92,8 @@ public class StellarScreenPresenter extends AbstractScreenPresenter<StellarScree
         eventBus.subscribe(new TypeReference<UpdateEvent<List<ICelestial>>>() {}.getType(), planetListUpdate);
     }
 
-    @Override
+
     public void shutdown() {
-        super.shutdown();
         eventBus.unsubscribe(LifecycleCreate.class, avatarCreate);
         eventBus.unsubscribe(LifecycleDestroy.class, avatarDestroy);
         eventBus.unsubscribe(DoSelection.class, planetSelect);
@@ -86,8 +101,13 @@ public class StellarScreenPresenter extends AbstractScreenPresenter<StellarScree
         eventBus.unsubscribe(UpdateEvent.class, planetListUpdate);
     }
 
+    public void updateLogicalState(float timePerFrame) {
+        view.updateLogicalState(timePerFrame);
+    }
 
-
+    public void updateGeometricState() {
+        view.updateGeometricState();
+    }
 
 
 }

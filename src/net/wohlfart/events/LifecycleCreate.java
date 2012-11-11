@@ -3,7 +3,7 @@ package net.wohlfart.events;
 public class LifecycleCreate<T> {
     private final T element;
 
-    public LifecycleCreate(T element) {
+    public LifecycleCreate(final T element) {
         this.element = element;
     }
 
