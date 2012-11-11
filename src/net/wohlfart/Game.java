@@ -4,8 +4,6 @@ import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
-import net.wohlfart.states.StellarState;
-
 import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.EventServiceLocator;
 
@@ -14,22 +12,16 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.ColorRGBA;
-import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.system.AppSettings;
-
-import de.lessvoid.nifty.Nifty;
 
 /**
  * hosting application states
  */
 public class Game extends Application implements IStateContext {
-    private static final String PATH_TO_NIFTY_UI = "interface/nifty-screens.xml";
-    private static final String INTRO_SCREEN_ID = "introScreen";
+
     private static final String INPUT_MAPPING_EXIT = "INPUT_MAPPING_EXIT"; // event key
 
     private final EventService eventBus;
-
-    private Nifty nifty;
 
     Game() {
         eventBus = EventServiceLocator.getEventBusService();
@@ -79,20 +71,9 @@ public class Game extends Application implements IStateContext {
         }, INPUT_MAPPING_EXIT);
 
         getViewPort().setBackgroundColor(ColorRGBA.LightGray);
-
-        // init a UI
-        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(getAssetManager(), getInputManager(), getAudioRenderer(), getGuiViewPort());
-        //  Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
-        //  Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
-        nifty = niftyDisplay.getNifty();
-        nifty.fromXml(PATH_TO_NIFTY_UI, INTRO_SCREEN_ID);
-
-        // attach the nifty display to the gui view port as a processor
-        getGuiViewPort().addProcessor(niftyDisplay);
-
-        // FIXME: try to remove the dependency on a specific state here
-        getStateManager().attach(new StellarState()); // initial state to render
+        getStateManager().attach(ApplicationStates.GAME.instance()); // initial state to render
     }
+
 
     // event loop
     @Override
@@ -120,10 +101,6 @@ public class Game extends Application implements IStateContext {
 
     public EventService getEventBus() {
         return eventBus;
-    }
-
-    public Nifty getNifty() {
-        return nifty;
     }
 
 }

@@ -10,9 +10,9 @@ import com.jme3.math.FastMath;
 /**
  * different strategies for building planets
  */
-public enum PlanetType {
+public enum CelestialType {
 
-    FIRE {
+    LAVA_PLANET {
         {
             maxRadius = 40;
             minRadius = 60;
@@ -25,7 +25,7 @@ public enum PlanetType {
         }
     },
 
-    WATER {
+    WATER_PLANET {
         {
             maxRadius = 20;
             minRadius = 30;
@@ -38,7 +38,7 @@ public enum PlanetType {
         }
     },
 
-    GAS {
+    GAS_PLANET {
         {
             maxRadius = 70;
             minRadius = 50;
@@ -51,7 +51,7 @@ public enum PlanetType {
         }
     },
 
-    CONTINENTAL {
+    CONTINENTAL_PLANET {
         {
             maxRadius = 30;
             minRadius = 60;
@@ -67,8 +67,14 @@ public enum PlanetType {
         }
     };
 
-    float minRadius = 6.371f; // in 10^6 m = 1000 km (earth has 6371 km)
-    float maxRadius = 100;
+    // all lengths in [10^3 km]
+
+    float minRadius = 6.371f; // in 10^6 m = 1000 km (earth has 6.371 x10^3 km)
+    float maxRadius = 100.0f;    // sun has 696 x10^3 km
+
+    float maxPathRadius = 6000000.0f;
+    float minPathRadius = 700.0f;     // sun-earth is 147098; sun-pluto is 5913520
+
 
     float minRot = FastMath.TWO_PI / 60f; // in rad/s, 2pi mean one rotation per second 2pi/3 means one rotation in 3 sec
     float maxRot = FastMath.TWO_PI / 300f;

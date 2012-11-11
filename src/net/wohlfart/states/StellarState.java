@@ -18,8 +18,6 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 
-import de.lessvoid.nifty.Nifty;
-
 /**
  * this game state is where we show planets and starships and stuff
  */
@@ -62,10 +60,6 @@ public class StellarState extends AbstractAppState {
 
         display = new DisplayNode(context.getAssetManager(), avatar, eventBus);
         context.getGuiViewPort().attachScene(display.getNode());
-
-        // TODO: remove this and implement this in a screen controller:
-        Nifty nifty = context.getNifty();
-        nifty.gotoScreen(SCREEN_ID);
     }
 
     // update state loop

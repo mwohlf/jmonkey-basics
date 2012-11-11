@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.Random;
 
 import net.wohlfart.events.DoSelection;
-import net.wohlfart.model.planets.AbstractPlanet;
-import net.wohlfart.model.planets.IPlanet;
-import net.wohlfart.model.planets.Planet;
+import net.wohlfart.model.planets.AbstractCelestial;
+import net.wohlfart.model.planets.ICelestial;
+import net.wohlfart.model.planets.CelestialImpl;
 
 import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.generics.TypeReference;
@@ -61,7 +61,7 @@ public class StellarSystem {
         final int planetCount = 10;
         final Random random = new Random(1);
         for (int i = 1; i <= planetCount; i++) {
-            final Planet planet = new Planet(assetManager, random.nextLong());
+            final CelestialImpl planet = new CelestialImpl(assetManager, random.nextLong());
             stellarNode.attachChild(planet);
             final float rad = (FastMath.TWO_PI / (float) planetCount) * (float) i;
             planet.setLocalTranslation(FastMath.sin(rad) * 200, 0, FastMath.cos(rad) * 200);
@@ -73,7 +73,7 @@ public class StellarSystem {
         stellarNode.sortChildren();
     }
 
-    public void add(final AbstractPlanet planet) {
+    public void add(final AbstractCelestial planet) {
         stellarNode.attachChild(planet);
     }
 
@@ -95,7 +95,7 @@ public class StellarSystem {
 
     public void move(final Vector3f vector) {
         localNode.move(vector);
-        stellarNode.move(vector.mult(1f));
+        stellarNode.move(vector);
     }
 
     public Vector3f getWorldTranslation() {
@@ -106,13 +106,13 @@ public class StellarSystem {
         CollisionResults results = new CollisionResults();
         stellarNode.collideWith(ray, results);
         CollisionResult collisionResult = results.getClosestCollision();
-        IPlanet planet = null;
+        ICelestial planet = null;
         if (collisionResult != null) {
             Geometry geometry = collisionResult.getGeometry(); 
-            planet = (IPlanet) geometry.getUserData(AbstractPlanet.PLANET_KEY);
+            planet = (ICelestial) geometry.getUserData(AbstractCelestial.PLANET_KEY);
         }
-        TypeReference<DoSelection<IPlanet>> type = new TypeReference<DoSelection<IPlanet>>() {};
-        DoSelection<IPlanet> event = new DoSelection<IPlanet>(planet);
+        TypeReference<DoSelection<ICelestial>> type = new TypeReference<DoSelection<ICelestial>>() {};
+        DoSelection<ICelestial> event = new DoSelection<ICelestial>(planet);
         eventBus.publish(type.getType(), event);
     }
 

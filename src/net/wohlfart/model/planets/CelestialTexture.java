@@ -11,21 +11,17 @@ import com.jme3.texture.Image.Format;
 import com.jme3.texture.Texture2D;
 import com.jme3.util.BufferUtils;
 
-public class PlanetTexture extends Texture2D {
+public class CelestialTexture extends Texture2D {
 
-    final Random random;
-
-    public PlanetTexture(final float radius, final PlanetType planetType, final long seed) {
+    public CelestialTexture(final float radius, final CelestialType planetType, final long seed) {
         this((int) (radius * 2f * FastMath.PI + 0.5f), (int) (radius * 2f * FastMath.PI + 0.5f), planetType, seed);
     }
 
     // single constructor entry point
-    protected PlanetTexture(final int width, final int height, final PlanetType planetType, final long seed) {
+    protected CelestialTexture(final int width, final int height, final CelestialType planetType, final long seed) {
         super(new Image(Format.RGBA8, width, height, ByteBuffer.allocateDirect(width * height * 4)));
-        random = new Random(seed);
-
-        float textureVariant = random.nextFloat();
-
+        // random for texture variation
+        float textureVariant = new Random(seed).nextFloat();
         byte[] data = new byte[width * height * 4];
         getImage().getData(0).get(data);
 
@@ -58,9 +54,6 @@ public class PlanetTexture extends Texture2D {
         return new Vector3f(xx, yy, zz);
     }
 
-    protected Random getRandom() {
-        return random;
-    }
 
     private void setPixel(int x, int y, Color color, int width, int height, byte[] data) {
         y = height - y - 1;

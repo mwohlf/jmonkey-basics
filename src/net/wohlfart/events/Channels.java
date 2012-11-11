@@ -1,6 +1,7 @@
 package net.wohlfart.events;
 
 public enum Channels {
-    TEXTMESSAGES;
+    TEXTMESSAGES,
+    BUS_TOPIC_STELLAR_SELECT;
 
 }

@@ -12,14 +12,14 @@ import com.jme3.texture.Image;
 
 public class PlanetTextureTest {
 
-    PlanetTexture planetTexture;
+    CelestialTexture planetTexture;
     int height;
     int width;
 
     @Before
     public void runBeforeEveryTest() {
         // use a big enough radius so we don't have rounding errors...
-        planetTexture = new PlanetTexture(200f, PlanetType.values()[0], 1l); // radius and random planet type
+        planetTexture = new CelestialTexture(200f, CelestialType.values()[0], 1l); // radius and random planet type
         Image image = planetTexture.getImage();
         height = image.getWidth();
         width = image.getHeight();

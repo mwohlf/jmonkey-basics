@@ -7,8 +7,6 @@ import com.jme3.input.InputManager;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 
-import de.lessvoid.nifty.Nifty;
-
 
 // interface for the state objects to avoid cyclic dependencies...
 public interface IStateContext {
@@ -24,7 +22,5 @@ public interface IStateContext {
     AssetManager getAssetManager();
 
     InputManager getInputManager();
-
-    Nifty getNifty();
 
 }

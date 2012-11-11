@@ -4,11 +4,12 @@ import java.util.Random;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 
-public class Planet extends AbstractPlanet {
+public class CelestialImpl extends AbstractCelestial {
     // number of sample / level of detail 3 means we have a pyramid...
     private static final int SAMPLES = 40;
     // neutral texture
@@ -17,26 +18,33 @@ public class Planet extends AbstractPlanet {
     private final long seed;
     private final Random random;
 
-    private final PlanetType planetType;
+    private final CelestialType planetType;
 
     private final Geometry planetGeometry; // z seems to be the up axis for geometries
     private final float rotSpeed; // [rad/s]
     private final Vector3f rotAxis;
     private final float radius; // in [10^6 m]
 
-    public Planet(final AssetManager assetManager, final long seed) {
+    private final float pathRadius;
+    private final float pathArc;
+
+    public CelestialImpl(final AssetManager assetManager, final long seed) {
         this.seed = seed;
         this.random = new Random(seed);
 
         setName("Planet[" + seed + "]");
 
         // random planet type
-        int index = random.nextInt(PlanetType.values().length);
-        planetType = PlanetType.values()[index];
+        int index = random.nextInt(CelestialType.values().length);
+        planetType = CelestialType.values()[index];
 
         radius = getRandom(planetType.minRadius, planetType.maxRadius);
 
         rotSpeed = getRandom(planetType.minRot, planetType.maxRot);
+
+        pathRadius = getRandom(planetType.minPathRadius, planetType.maxPathRadius);
+
+        pathArc = getRandom(-FastMath.PI, FastMath.PI); // location on the path
 
         float f = planetType.maxAxisDeplacement;
         // rotAxis = new Vector3f(0,0,1);
@@ -44,7 +52,7 @@ public class Planet extends AbstractPlanet {
 
         // Lighting.j3md supports: DiffuseMap, NormalMap, SpecularMap, and ParallaxMap.
         Material material = new Material(assetManager, TEXTURE_PATH);
-        material.setTexture("DiffuseMap", new PlanetTexture(radius, planetType, seed));
+        material.setTexture("DiffuseMap", new CelestialTexture(radius, planetType, seed));
 
         Sphere sphere = new Sphere(SAMPLES, SAMPLES, radius);
         sphere.setTextureMode(Sphere.TextureMode.Projected);
@@ -70,7 +78,7 @@ public class Planet extends AbstractPlanet {
     }
 
     @Override
-    public PlanetType getType() {
+    public CelestialType getType() {
         return planetType;
     }
 
