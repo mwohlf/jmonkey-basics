@@ -313,7 +313,7 @@ public class InputProcessor {
             if (avatar == null) {
                 return;
             }
-            inputManager.setCursorVisible(!isPressed); // hide the cursor when the button is pressed
+
 
             switch (Key.valueOf(event)) {
             case MOUSE_BUTTON_MIDDLE:
@@ -332,6 +332,7 @@ public class InputProcessor {
                 LOGGER.severe("unknown event: '" + event + "' exiting eventhandler");
                 return; // bail out
             }
+            inputManager.setCursorVisible(!InputProcessor.this.rotationModeEnabled); // hide the cursor when rotating
         }
     }
 
@@ -344,7 +345,6 @@ public class InputProcessor {
         public void onMouseButtonEvent(MouseButtonEvent evt) {
             view.mouseButton(evt);
         }
-
     }
 
 }

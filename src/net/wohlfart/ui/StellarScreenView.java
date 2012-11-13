@@ -131,16 +131,12 @@ public class StellarScreenView implements IScreenView {
     }
 
     private Window getDragableComponent(final MouseButtonEvent evt) {
-        int x = evt.getX();
-        int y = evt.getY();
         for (Window window : componentFactory.getWindows()) {
-            if (window.getWorldBound().intersects(new Vector3f(x, y, 0))) {
-                evt.setConsumed(); // start dragging the drag is done by the move method
+            if (window.getWorldBound().intersects(new Vector3f(evt.getX(), evt.getY(), 0))) {
                 return window;
             }
         }
-        return null; // nothing found
+        return null;
     }
-
 
 }
