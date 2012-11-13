@@ -5,6 +5,9 @@ import java.util.logging.Logger;
 
 import net.wohlfart.IStateContext;
 import net.wohlfart.model.planets.ICelestial;
+import net.wohlfart.ui.commands.DragAndDropCommand;
+import net.wohlfart.ui.commands.ICommand;
+import net.wohlfart.ui.commands.NullCommand;
 import net.wohlfart.ui.components.ComponentFactory;
 import net.wohlfart.ui.components.Window;
 import net.wohlfart.user.IAvatar;
@@ -16,6 +19,7 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.input.event.MouseMotionEvent;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
@@ -33,7 +37,6 @@ public class StellarScreenView implements IScreenView {
     protected final Node delegatee;
     protected final AssetManager assetManager;
     protected final ViewPort guiViewPort;
-    //protected StellarScreenPresenter presenter;
     protected final ComponentFactory componentFactory;
 
 
@@ -89,46 +92,54 @@ public class StellarScreenView implements IScreenView {
     }
 
 
-    Window window = null;
+    ICommand dragAndDropCommand = NullCommand.INSTANCE;
 
 
     @Override
     public void mouseMotion(final MouseMotionEvent evt) {
-        int x = evt.getX();
-        int y = evt.getY();
 
-        if (window != null) {
-            window.setLocation(x, y);
-            //evt.setConsumed();
+        if (dragAndDropCommand != null) {
+            dragAndDropCommand.updateCommand(evt);
         }
-
-//        for (Spatial spatial : delegatee.getChildren()) {
-//            boolean hit = spatial.getWorldBound().intersects(new Vector3f(x, y, 0));
-//        }
 
     }
 
     @Override
-    public void mouseButton(MouseButtonEvent evt) {
-        int x = evt.getX();
-        int y = evt.getY();
-
+    public void mouseButton(final MouseButtonEvent evt) {
         LOGGER.info("StellarScreenView: incoming mouse event: " + evt);
 
-        if (evt.isPressed() && (evt.getButtonIndex() == MouseInput.BUTTON_LEFT)) {
-            for (Window window : componentFactory.getWindows()) {
-                if (window.getWorldBound().intersects(new Vector3f(x, y, 0))) {
-                    this.window = window;
-                    evt.setConsumed(); // start dragging the drag is done by the move method
-                    break;
-                }
-            }
+        DragAndDropCommand.IDragAndDropable dragAndDropable;
+        if (isDragStartGesture(evt) && (dragAndDropable = getDragableComponent(evt)) != null) {
+            dragAndDropCommand = new DragAndDropCommand(dragAndDropable, new Vector2f(evt.getX(), evt.getY()));
+            evt.setConsumed();
         }
-        else if (evt.isReleased()) {
-            window = null;
-            //evt.setConsumed();
+        else if (isDragEndGesture(evt)) {
+            dragAndDropCommand.execute(evt);
+            dragAndDropCommand = NullCommand.INSTANCE;
+            evt.setConsumed();
         }
 
+    }
+
+
+    private boolean isDragEndGesture(final MouseButtonEvent evt) {
+        return (evt.isReleased() && (evt.getButtonIndex() == MouseInput.BUTTON_LEFT));
+    }
+
+    private boolean isDragStartGesture(final MouseButtonEvent evt) {
+        return (evt.isPressed() && (evt.getButtonIndex() == MouseInput.BUTTON_LEFT));
+    }
+
+    private Window getDragableComponent(final MouseButtonEvent evt) {
+        int x = evt.getX();
+        int y = evt.getY();
+        for (Window window : componentFactory.getWindows()) {
+            if (window.getWorldBound().intersects(new Vector3f(x, y, 0))) {
+                evt.setConsumed(); // start dragging the drag is done by the move method
+                return window;
+            }
+        }
+        return null; // nothing found
     }
 
 

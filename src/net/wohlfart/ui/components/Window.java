@@ -1,17 +1,22 @@
 package net.wohlfart.ui.components;
 
+import net.wohlfart.ui.commands.DragAndDropCommand;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Quad;
 
-public class Window extends Node {
+
+public class Window extends Node implements DragAndDropCommand.IDragAndDropable {
 
     private BitmapText titleText;
     private Quad quad;
@@ -40,8 +45,8 @@ public class Window extends Node {
         geo.setMaterial(mat);
         attachChild(geo);
 
-        setLocation(50, 50);
-        setSize(270,270);
+        setLocation(new Vector2f(50, 50));
+        setSize(new Vector2f(270,270));
     }
 
 
@@ -49,12 +54,24 @@ public class Window extends Node {
         titleText.setText(text);
     }
 
-    public void setLocation(final int x, final int y) {
-        setLocalTranslation(x,y,0);
+    @Override
+    public void setLocation(final Vector2f v) {
+        setLocalTranslation(v.x,v.y,0);
     }
 
-    public void setSize(final int width, final int height) {
-        quad.updateGeometry(width, height);
+    @Override
+    public Vector2f getLocation() {
+        Vector3f v = getLocalTranslation();
+        return new Vector2f(v.x,v.y);
+    }
+
+
+    public void setSize(final Vector2f v) {
+        quad.updateGeometry(v.x, v.y);
+    }
+
+    public Vector2f getSize() {
+        return new Vector2f(quad.getWidth(), quad.getHeight());
     }
 
 
