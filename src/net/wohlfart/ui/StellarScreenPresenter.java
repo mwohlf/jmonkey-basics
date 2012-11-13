@@ -15,7 +15,7 @@ import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.EventSubscriber;
 import org.bushe.swing.event.generics.TypeReference;
 
-public class StellarScreenPresenter {
+public class StellarScreenPresenter implements IScreenView.IScreenPresenter{
 
 
     // view
@@ -101,13 +101,6 @@ public class StellarScreenPresenter {
         eventBus.unsubscribe(UpdateEvent.class, planetListUpdate);
     }
 
-    public void updateLogicalState(float timePerFrame) {
-        view.updateLogicalState(timePerFrame);
-    }
-
-    public void updateGeometricState() {
-        view.updateGeometricState();
-    }
 
 
 }

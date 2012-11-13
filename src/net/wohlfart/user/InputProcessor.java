@@ -58,7 +58,7 @@ public class InputProcessor {
 
     // target object to move:
     private IAvatar avatar;
-    private IScreenView screen;
+    private IScreenView view;
 
     // some state information
     private boolean rotationModeEnabled;
@@ -97,12 +97,13 @@ public class InputProcessor {
         inputManager.removeListener(actionMouseButton);
     }
 
-    public void attachScreen(final IScreenView screen) {
-        this.screen = screen;
+    public void attachView(final IScreenView view) {
+        this.view = view;
         inputManager.addRawInputListener(rawInputListener);
     }
 
-    public void detachCurrentScreen() {
+    public void detachCurrentView() {
+        this.view = null;
         inputManager.removeRawInputListener(rawInputListener);
     }
 
@@ -337,11 +338,11 @@ public class InputProcessor {
     private class DetailedInputListener extends RawInputAdaptor {
         @Override
         public void onMouseMotionEvent(MouseMotionEvent evt) {
-            screen.mouseMotion(evt);
+            view.mouseMotion(evt);
         }
         @Override
         public void onMouseButtonEvent(MouseButtonEvent evt) {
-            screen.mouseButton(evt);
+            view.mouseButton(evt);
         }
 
     }

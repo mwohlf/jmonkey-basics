@@ -18,6 +18,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.scene.Spatial;
 
 /**
  * this game state is where we show planets and starships and stuff
@@ -25,8 +26,8 @@ import com.jme3.renderer.Camera;
 public class StellarState extends AbstractAppState {
 
     protected InputProcessor inputProcessor;
-    protected StellarSystem stellarSystem;
-    protected StellarScreenView stellarScreenView;
+    protected Spatial worldSpatial;
+    protected Spatial guiSpatial;
     protected StellarScreenPresenter presenter;
     protected EventService eventBus;
     protected IAvatar avatar;
@@ -48,13 +49,13 @@ public class StellarState extends AbstractAppState {
         cam.lookAt(lookAt, Vector3f.UNIT_Y /* world up */);
 
         // attach stellar view
-        stellarSystem = new StellarSystem(context);
-        context.getViewPort().attachScene(stellarSystem.getNode());
+        StellarSystem stellarSystem = new StellarSystem(context);
+        context.getViewPort().attachScene(worldSpatial = stellarSystem.getNode());
 
-        stellarScreenView = new StellarScreenView(context);
+        StellarScreenView stellarScreenView = new StellarScreenView(context);
         presenter = new StellarScreenPresenter(context);
         presenter.connectView(stellarScreenView);
-        context.getGuiViewPort().attachScene(stellarScreenView.getNode());
+        context.getGuiViewPort().attachScene(guiSpatial = stellarScreenView.getNode());
 
         avatar = new AvatarImpl(stellarSystem, context.getCamera());
         TypeReference<LifecycleCreate<IAvatar>> type = new TypeReference<LifecycleCreate<IAvatar>>() {};
@@ -62,7 +63,7 @@ public class StellarState extends AbstractAppState {
         eventBus.publish(type.getType(), event);
         inputProcessor = new InputProcessor(context);
         inputProcessor.attachAvatar(avatar);
-        inputProcessor.attachScreen(stellarScreenView);
+        inputProcessor.attachView(stellarScreenView);
     }
 
     // update state loop
@@ -70,11 +71,11 @@ public class StellarState extends AbstractAppState {
     public void update(final float timePerFrame) {
         super.update(timePerFrame); // makes sure to execute AppTasks
 
-        stellarSystem.updateLogicalState(timePerFrame);
-        presenter.updateLogicalState(timePerFrame);
+        worldSpatial.updateLogicalState(timePerFrame);
+        guiSpatial.updateLogicalState(timePerFrame);
 
-        stellarSystem.updateGeometricState();
-        presenter.updateGeometricState();
+        worldSpatial.updateGeometricState();
+        guiSpatial.updateGeometricState();
     }
 
     // destroy
@@ -84,14 +85,14 @@ public class StellarState extends AbstractAppState {
 
         presenter.shutdown();
         inputProcessor.detachCurrentAvatar();
-        inputProcessor.detachCurrentScreen();
+        inputProcessor.detachCurrentView();
 
         TypeReference<LifecycleDestroy<IAvatar>> type = new TypeReference<LifecycleDestroy<IAvatar>>() {};
         LifecycleDestroy<IAvatar> event = new LifecycleDestroy<IAvatar>(avatar);
         eventBus.publish(type.getType(), event);
 
-        context.getViewPort().detachScene(stellarSystem.getNode());
-        context.getGuiViewPort().detachScene(stellarScreenView.getNode());
+        context.getViewPort().detachScene(worldSpatial);
+        context.getGuiViewPort().detachScene(guiSpatial);
     }
 
 }

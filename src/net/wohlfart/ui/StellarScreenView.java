@@ -53,7 +53,7 @@ public class StellarScreenView implements IScreenView {
     }
 
 
-    public void setPresenter(StellarScreenPresenter presenter) {
+    public void setPresenter(IScreenPresenter presenter) {
         //this.presenter = presenter;
         setupUserView();
     }
@@ -87,15 +87,6 @@ public class StellarScreenView implements IScreenView {
     public void setCurrentAvatar(final IAvatar iAvatar) {
 
     }
-
-    public void updateLogicalState(float timePerFrame) {
-        delegatee.updateLogicalState(timePerFrame);
-    }
-
-    public void updateGeometricState() {
-        delegatee.updateGeometricState();
-    }
-
 
 
     Window window = null;
