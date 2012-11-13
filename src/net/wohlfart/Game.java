@@ -76,14 +76,16 @@ class Game extends Application implements IStateContext {
     }
 
 
-    // event loop
+    // event loop, this is called by LwjglAbstractDisplay.runLoop()
     @Override
     public void update() {
         super.update(); // makes sure to execute AppTasks
 
         float timePerFrame = timer.getTimePerFrame() * speed;
-        // update states
+        // update states; the stages updates their nodes unlike in the SimpleApp class
+        // the states are responsible for the root node / gui node
         stateManager.update(timePerFrame);
+
         // render states
         stateManager.render(getRenderManager());
         // no idea what this is needed for
@@ -96,9 +98,14 @@ class Game extends Application implements IStateContext {
     @Override
     public void stop(final boolean waitFor) {
         // TODO: do some cleanup on exit
-
+        getViewPort().clearScenes();
+        getViewPort().clearProcessors();
+        getGuiViewPort().clearScenes();
+        getGuiViewPort().clearProcessors();
         super.stop(waitFor);
     };
+
+
 
     public EventService getEventBus() {
         return eventBus;

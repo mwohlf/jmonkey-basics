@@ -13,8 +13,7 @@ import com.jme3.scene.shape.Quad;
 
 public class Window extends Node {
 
-    private BitmapText perfText;
-
+    private BitmapText titleText;
     private Quad quad;
 
 
@@ -23,17 +22,16 @@ public class Window extends Node {
         setQueueBucket(Bucket.Gui);
         setCullHint(CullHint.Never);
 
-        assetManager.loadFont("Interface/Fonts/Default.fnt");
         BitmapFont guiFont = assetManager.loadFont("Interface/Fonts/Console.fnt");
 
-        BitmapText perfText = new BitmapText(guiFont, false);
-        perfText.setSize(guiFont.getCharSet().getRenderedSize());
-        perfText.setColor(ColorRGBA.Blue);
-        perfText.setLocalTranslation(10, perfText.getLineHeight() * 10, 0);
-        perfText.setText("window here");
-        attachChild(perfText);
+        titleText = new BitmapText(guiFont, false);
+        titleText.setSize(guiFont.getCharSet().getRenderedSize());
+        titleText.setColor(ColorRGBA.Blue);
+        titleText.setLocalTranslation(10, titleText.getLineHeight() * 10, 0);
+        titleText.setText("window here");
+        attachChild(titleText);
 
-        quad = new Quad(100,200);
+        quad = new Quad(100,100);
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setTransparent(true);
         mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
@@ -42,12 +40,21 @@ public class Window extends Node {
         geo.setMaterial(mat);
         attachChild(geo);
 
-        setLocalTranslation(50, 50, 0);
+        setLocation(50, 50);
+        setSize(270,270);
     }
 
 
-    public void setText(String text) {
-        perfText.setText(text);
+    public void setTitle(String text) {
+        titleText.setText(text);
+    }
+
+    public void setLocation(final int x, final int y) {
+        setLocalTranslation(x,y,0);
+    }
+
+    public void setSize(final int width, final int height) {
+        quad.updateGeometry(width, height);
     }
 
 

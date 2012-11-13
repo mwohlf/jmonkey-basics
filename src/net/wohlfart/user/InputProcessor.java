@@ -14,6 +14,7 @@ import com.jme3.input.controls.InputListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.input.event.MouseMotionEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -307,6 +308,7 @@ public class InputProcessor {
     private class ActionMouseButton implements ActionListener {
         @Override
         public void onAction(final String event, final boolean isPressed, final float timePerFrame) {
+            LOGGER.info("ActionMouseButton: incoming mouse event: " + event);
             if (avatar == null) {
                 return;
             }
@@ -336,8 +338,12 @@ public class InputProcessor {
         @Override
         public void onMouseMotionEvent(MouseMotionEvent evt) {
             screen.mouseMotion(evt);
-            LOGGER.info("evt: " + evt);
         }
+        @Override
+        public void onMouseButtonEvent(MouseButtonEvent evt) {
+            screen.mouseButton(evt);
+        }
+
     }
 
 }
