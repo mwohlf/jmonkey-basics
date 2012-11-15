@@ -15,8 +15,15 @@ import org.bushe.swing.event.EventService;
 import org.bushe.swing.event.EventSubscriber;
 import org.bushe.swing.event.generics.TypeReference;
 
-public class StellarScreenPresenter implements IScreenView.IScreenPresenter{
 
+
+/**
+ * the job of this class is to provide a screen with model data and take user input actions
+ * this shoud be the only interface 
+ * 
+ * @author michael
+ */
+public class StellarScreenPresenter implements IScreenView.IScreenPresenter {
 
     // view
     protected StellarScreenView view;

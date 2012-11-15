@@ -34,7 +34,7 @@ public class DragAndDropCommand implements ICommand {
     @Override
     public void execute(final MouseButtonEvent evt) {
         Vector2f newLoc = new Vector2f(evt.getX(), evt.getY())
-            .addLocal(startComponent.subtract(startMouse));
+            .subtractLocal(startMouse.subtract(startComponent));
         dragAndDropable.setLocation(newLoc);
     }
 

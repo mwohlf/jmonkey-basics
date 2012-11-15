@@ -3,7 +3,6 @@ package net.wohlfart.user;
 import java.util.logging.Logger;
 
 import net.wohlfart.IStateContext;
-import net.wohlfart.ui.IScreenView;
 
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
@@ -57,11 +56,11 @@ public class InputProcessor {
     private final InputManager inputManager;
 
     // target object to move:
-    private IAvatar avatar;
-    private IScreenView view;
+    private IAvatar avatar;  // FIXME: check if we might use a NullAvatar
+    private IMouseAware mouseAware;
 
     // some state information
-    private boolean rotationModeEnabled;
+    private boolean rotationOngoing;
 
     // action processors
     private ActionMoveDigital actionMoveDigital = new ActionMoveDigital();
@@ -97,13 +96,13 @@ public class InputProcessor {
         inputManager.removeListener(actionMouseButton);
     }
 
-    public void attachView(final IScreenView view) {
-        this.view = view;
+    public void attachView(final IMouseAware mouseAware) {
+        this.mouseAware = mouseAware;
         inputManager.addRawInputListener(rawInputListener);
     }
 
     public void detachCurrentView() {
-        this.view = null;
+        this.mouseAware = null;
         inputManager.removeRawInputListener(rawInputListener);
     }
 
@@ -282,7 +281,7 @@ public class InputProcessor {
             if (avatar == null) {
                 return;
             }
-            if (!rotationModeEnabled) {
+            if (!rotationOngoing) {
                 return;
             }
             final float angle = SPEED * value * timePerFrame;
@@ -319,7 +318,7 @@ public class InputProcessor {
             case MOUSE_BUTTON_MIDDLE:
             case MOUSE_BUTTON_RIGHT:
                 synchronized (InputProcessor.this) {
-                    InputProcessor.this.rotationModeEnabled = isPressed;
+                    InputProcessor.this.rotationOngoing = isPressed;
                 }
                 break;
             case MOUSE_BUTTON_LEFT:
@@ -332,18 +331,18 @@ public class InputProcessor {
                 LOGGER.severe("unknown event: '" + event + "' exiting eventhandler");
                 return; // bail out
             }
-            inputManager.setCursorVisible(!InputProcessor.this.rotationModeEnabled); // hide the cursor when rotating
+            inputManager.setCursorVisible(!InputProcessor.this.rotationOngoing); // hide the cursor when rotating
         }
     }
 
     private class DetailedInputListener extends RawInputAdaptor {
         @Override
         public void onMouseMotionEvent(MouseMotionEvent evt) {
-            view.mouseMotion(evt);
+            mouseAware.mouseMotion(evt);
         }
         @Override
         public void onMouseButtonEvent(MouseButtonEvent evt) {
-            view.mouseButton(evt);
+            mouseAware.mouseButton(evt);
         }
     }
 

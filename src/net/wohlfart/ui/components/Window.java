@@ -1,6 +1,7 @@
 package net.wohlfart.ui.components;
 
 import net.wohlfart.ui.commands.DragAndDropCommand;
+import net.wohlfart.ui.commands.ResizeCommand;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapFont;
@@ -16,7 +17,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Quad;
 
 
-public class Window extends Node implements DragAndDropCommand.IDragAndDropable {
+public class Window extends Node implements DragAndDropCommand.IDragAndDropable, ResizeCommand.IResizable {
 
     private BitmapText titleText;
     private Quad quad;
