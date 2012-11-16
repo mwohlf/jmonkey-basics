@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import net.wohlfart.IStateContext;
 import net.wohlfart.model.planets.ICelestial;
+import net.wohlfart.ui.commands.CloseCommand;
 import net.wohlfart.ui.commands.DragAndDropCommand;
 import net.wohlfart.ui.commands.ICommand;
 import net.wohlfart.ui.commands.NullCommand;
@@ -100,20 +101,22 @@ public class StellarScreenView implements IMouseAware, IScreenView {
 
     @Override
     public void mouseMotion(final MouseMotionEvent evt) {
-
         if (ongoingCommand != null) {
             ongoingCommand.updateCommand(evt);
         }
-
     }
 
     @Override
     public void mouseButton(final MouseButtonEvent evt) {
         LOGGER.info("StellarScreenView: incoming mouse event: " + evt);
 
+
         Window window;
         if ((window = findDragObject(evt)) != null) {
-            if (isResizeStartGesture(evt, window)) {
+            if (isCloseOperation(evt, window)) {
+                new CloseCommand(window) .execute(evt);
+                evt.setConsumed();
+            } else if (isResizeStartGesture(evt, window)) {
                 ongoingCommand = new ResizeCommand(window, new Vector2f(evt.getX(), evt.getY()));
                 evt.setConsumed();
             } else {
@@ -127,6 +130,18 @@ public class StellarScreenView implements IMouseAware, IScreenView {
             evt.setConsumed();
         }
     }
+
+
+
+    private boolean isCloseOperation(final MouseButtonEvent evt, final Window window) {
+        float maxX = window.getLocation().x + window.getSize().x;
+        float maxY = window.getLocation().y + window.getSize().y;
+        float minX = maxX - 15;
+        float minY = maxY - 15;
+        boolean inCloseRegion = (maxX > evt.getX()) && (minX < evt.getX()) && (maxY > evt.getY()) && (minY < evt.getY());
+        return (evt.isPressed() && (evt.getButtonIndex() == MouseInput.BUTTON_LEFT) && inCloseRegion);
+    }
+
 
 
     private boolean isResizeStartGesture(final MouseButtonEvent evt, final Window window) {

@@ -76,4 +76,9 @@ public class Window extends Node implements DragAndDropCommand.IDragAndDropable,
     }
 
 
+    public void close() {
+        this.getParent().detachChild(this);
+    }
+
+
 }
